@@ -19,15 +19,9 @@ jobs:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
       - name: Extract config from brain.yaml
-        run: |
-          INSTANCE_NAME="$(basename "$PWD")"
-          BRAIN_MODEL="$(grep '^brain:' brain.yaml | sed 's/^brain:[[:space:]]*//' | tr -d '"' | tr -d "'")"
-          BRAIN_DOMAIN="$(grep '^domain:' brain.yaml | sed 's/^domain:[[:space:]]*//' | tr -d '"' | tr -d "'")"
-          echo "INSTANCE_NAME=$INSTANCE_NAME" >> "$GITHUB_ENV"
-          echo "BRAIN_MODEL=$BRAIN_MODEL" >> "$GITHUB_ENV"
-          echo "BRAIN_DOMAIN=$BRAIN_DOMAIN" >> "$GITHUB_ENV"
-          echo "IMAGE_REPOSITORY=ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}" >> "$GITHUB_ENV"
-          echo "REGISTRY_USERNAME=${{ github.repository_owner }}" >> "$GITHUB_ENV"
+        run: ./scripts/extract-brain-config.rb
+        env:
+          INSTANCE_NAME: ${{ github.event.repository.name }}
 
       - name: Validate env via varlock
         env:
@@ -92,25 +86,24 @@ jobs:
             throw new Error('Missing GITHUB_ENV');
           }
 
+          const newline = String.fromCharCode(10);
+          const carriageReturn = String.fromCharCode(13);
           const lines = Object.entries(env).flatMap(([key, value]) => {
             if (value === null || value === undefined) {
               return [];
             }
 
-            const text = String(value).replace(/
-/g, '
-');
-            if (text.includes('
-')) {
+            const text = String(value)
+              .split(carriageReturn + newline)
+              .join(newline);
+            if (text.includes(newline)) {
               return [];
             }
 
             return [key + '=' + text];
           });
 
-          appendFileSync(githubEnvPath, lines.join('
-') + '
-');
+          appendFileSync(githubEnvPath, lines.join(newline) + newline);
           NODE
 
       - name: Write Kamal SSH key
@@ -123,14 +116,15 @@ jobs:
             throw new Error('Missing KAMAL_SSH_PRIVATE_KEY');
           }
 
-          let privateKeyText = String(privateKey).replace(/
-/g, '
-').replace(/\n/g, '
-');
-          if (!privateKeyText.endsWith('
-')) {
-            privateKeyText += '
-';
+          const newline = String.fromCharCode(10);
+          const carriageReturn = String.fromCharCode(13);
+          let privateKeyText = String(privateKey)
+            .split(carriageReturn + newline)
+            .join(newline)
+            .split('\n')
+            .join(newline);
+          if (!privateKeyText.endsWith(newline)) {
+            privateKeyText += newline;
           }
 
           const sshDir = process.env.HOME + '/.ssh';
