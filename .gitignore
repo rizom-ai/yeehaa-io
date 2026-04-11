@@ -1,0 +1,13 @@
+.env
+.env.*
+!.env.example
+!.env.schema
+node_modules
+brain.log
+brain-data/
+dist/
+cache/
+data/
+origin.pem
+origin.key
+origin.csr
