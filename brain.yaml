@@ -5,11 +5,10 @@ domain: yeehaa.io
 # for richer presets, or list capability ids in add: / remove: to fine-tune.
 preset: full
 
-# Keep current yeehaa.io site/theme pairing. Local src/site.ts and src/theme.css
-# remain available if this instance later switches to the local convention.
+# Keep current yeehaa.io site package. Local src/theme.css now provides the
+# theme via the standalone convention.
 site:
   package: "@brains/site-yeehaa"
-  theme: "@brains/theme-brutalist"
 
 # Permissions
 anchors:
