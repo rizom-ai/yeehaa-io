@@ -41,6 +41,7 @@ jobs:
         with:
           context: .
           file: deploy/Dockerfile
+          target: standalone
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: |

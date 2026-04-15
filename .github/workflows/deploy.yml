@@ -395,8 +395,13 @@ jobs:
             }
           }
 
+          const previewDomain = process.env.PREVIEW_DOMAIN;
+          if (!previewDomain) {
+            throw new Error('Missing PREVIEW_DOMAIN');
+          }
+
           await upsertRecord(domain);
-          await upsertRecord('preview.' + domain);
+          await upsertRecord(previewDomain);
           NODE
 
       - name: Install Kamal
@@ -434,7 +439,7 @@ jobs:
           SERVER_IP: ${{ steps.provision.outputs.server_ip }}
         run: |
           curl -I -k --max-time 20 --resolve "$BRAIN_DOMAIN:443:$SERVER_IP" "https://$BRAIN_DOMAIN"
-          curl -I -k --max-time 20 --resolve "preview.$BRAIN_DOMAIN:443:$SERVER_IP" "https://preview.$BRAIN_DOMAIN"
+          curl -I -k --max-time 20 --resolve "$PREVIEW_DOMAIN:443:$SERVER_IP" "https://$PREVIEW_DOMAIN"
 
       - name: Dump remote proxy diagnostics
         if: failure()
