@@ -6,7 +6,7 @@
     "start": "bunx brain start"
   },
   "dependencies": {
-    "@rizom/brain": "0.2.0-alpha.19",
+    "@rizom/brain": "0.2.0-alpha.28",
     "preact": "^10.27.2"
   }
 }
