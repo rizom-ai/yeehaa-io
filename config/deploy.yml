@@ -18,7 +18,8 @@ proxy:
     path: /health
     interval: 2
     timeout: 5
-  deploy_timeout: 180
+
+deploy_timeout: 180
 
 registry:
   server: ghcr.io
