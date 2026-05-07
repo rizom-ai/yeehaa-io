@@ -4,6 +4,8 @@ domain: yeehaa.io
 # Plugin preset — "core" is the minimal on-ramp. Use "default" or "full"
 # for richer presets, or list capability ids in add: / remove: to fine-tune.
 preset: full
+add:
+  - rizom-ecosystem
 
 # Local src/site.ts and src/theme.css provide the site and theme via the
 # standalone conventions.

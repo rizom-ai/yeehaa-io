@@ -1,9 +1,5 @@
-import {
-  ProfessionalLayout,
-  professionalRoutes,
-  professionalSitePlugin,
-  type SitePackage,
-} from "@rizom/brain/site";
+import { professionalRoutes, type SitePackage } from "@rizom/brain/site";
+import { YeehaaLayout } from "./layout";
 
 /**
  * Local yeehaa site.
@@ -11,12 +7,28 @@ import {
  * Mirrors the old monorepo `@brains/site-yeehaa` package while using the
  * standalone local site convention.
  */
-const site: SitePackage = {
+const routes = professionalRoutes.map((route) => {
+  const candidate = route as { id?: string; sections?: unknown[] };
+  if (candidate.id !== "home") return route;
+
+  return {
+    ...route,
+    sections: [
+      ...(candidate.sections ?? []),
+      {
+        id: "ecosystem",
+        template: "rizom-ecosystem:ecosystem",
+        dataQuery: { query: { id: "rizom-ecosystem" } },
+      },
+    ],
+  };
+});
+
+const site = {
   layouts: {
-    default: ProfessionalLayout,
+    default: YeehaaLayout,
   },
-  routes: professionalRoutes,
-  plugin: (config) => professionalSitePlugin(config ?? {}),
+  routes,
   entityDisplay: {
     post: { label: "Essay" },
     deck: { label: "Presentation" },
@@ -47,6 +59,6 @@ const site: SitePackage = {
       navigation: { slot: "secondary" },
     },
   },
-};
+} satisfies Partial<SitePackage>;
 
 export default site;
