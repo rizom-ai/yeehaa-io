@@ -5,7 +5,7 @@
     "": {
       "name": "yeehaa-io",
       "dependencies": {
-        "@rizom/brain": "0.2.0-alpha.66",
+        "@rizom/brain": "0.2.0-alpha.67",
         "preact": "^10.27.2",
       },
       "devDependencies": {
@@ -126,7 +126,7 @@
 
     "@neon-rs/load": ["@neon-rs/load@0.0.4", "", {}, "sha512-kTPhdZyTQxB+2wpiRcFWrDcejc4JI6tkPuS7UZCG4l6Zvc5kU/gGQ/ozvHTh1XR5tS+UlfAfGuPajjzQjCiHCw=="],
 
-    "@rizom/brain": ["@rizom/brain@0.2.0-alpha.66", "", { "dependencies": { "@clack/prompts": "^0.11.0", "@modelcontextprotocol/sdk": "^1.24.0", "@tailwindcss/postcss": "^4.1.13", "@tailwindcss/typography": "^0.5.19", "postcss": "^8.5.6", "preact": "^10.27.2", "preact-render-to-string": "^6.3.1", "tailwindcss": "^4.1.11" }, "optionalDependencies": { "@bitwarden/sdk-napi": "^1.0.0", "@libsql/client": "^0.15.7", "@tailwindcss/oxide": "^4.1.4", "better-sqlite3": "^11.8.1", "lightningcss": "^1.29.2", "react-devtools-core": "^6.1.1", "sharp": "^0.34.5" }, "bin": { "brain": "dist/brain.js" } }, "sha512-7xk2TzpyX3lMJgm8I2+mGHzxH1jHQE//DDG3lTXvFmYTn1lG0QPA+bVKnPULKGN51nrorDaw0y5sV5M5QFbojw=="],
+    "@rizom/brain": ["@rizom/brain@0.2.0-alpha.67", "", { "dependencies": { "@clack/prompts": "^0.11.0", "@modelcontextprotocol/sdk": "^1.24.0", "@tailwindcss/postcss": "^4.1.13", "@tailwindcss/typography": "^0.5.19", "postcss": "^8.5.6", "preact": "^10.27.2", "preact-render-to-string": "^6.3.1", "tailwindcss": "^4.1.11" }, "optionalDependencies": { "@bitwarden/sdk-napi": "^1.0.0", "@libsql/client": "^0.15.7", "@tailwindcss/oxide": "^4.1.4", "better-sqlite3": "^11.8.1", "lightningcss": "^1.29.2", "react-devtools-core": "^6.1.1", "sharp": "^0.34.5" }, "bin": { "brain": "dist/brain.js" } }, "sha512-drggY9tpPuznqAXZz9ZC3nSHzgxYWfDqHBzE+rnZlnS/IJ3ezaCWmROiRUWcNi08oKHN1CE7LoxWg53RYhDf7g=="],
 
     "@tailwindcss/node": ["@tailwindcss/node@4.2.2", "", { "dependencies": { "@jridgewell/remapping": "^2.3.5", "enhanced-resolve": "^5.19.0", "jiti": "^2.6.1", "lightningcss": "1.32.0", "magic-string": "^0.30.21", "source-map-js": "^1.2.1", "tailwindcss": "4.2.2" } }, "sha512-pXS+wJ2gZpVXqFaUEjojq7jzMpTGf8rU6ipJz5ovJV6PUGmlJ+jvIwGrzdHdQ80Sg+wmQxUFuoW1UAAwHNEdFA=="],
 
