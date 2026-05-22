@@ -5,7 +5,7 @@
     "": {
       "name": "yeehaa-io",
       "dependencies": {
-        "@rizom/brain": "0.2.0-alpha.71",
+        "@rizom/brain": "0.2.0-alpha.80",
         "preact": "^10.27.2",
       },
       "devDependencies": {
@@ -126,7 +126,7 @@
 
     "@neon-rs/load": ["@neon-rs/load@0.0.4", "", {}, "sha512-kTPhdZyTQxB+2wpiRcFWrDcejc4JI6tkPuS7UZCG4l6Zvc5kU/gGQ/ozvHTh1XR5tS+UlfAfGuPajjzQjCiHCw=="],
 
-    "@rizom/brain": ["@rizom/brain@0.2.0-alpha.71", "", { "dependencies": { "@clack/prompts": "^0.11.0", "@modelcontextprotocol/sdk": "^1.24.0", "@tailwindcss/postcss": "^4.1.13", "@tailwindcss/typography": "^0.5.19", "postcss": "^8.5.6", "preact": "^10.27.2", "preact-render-to-string": "^6.3.1", "tailwindcss": "^4.1.11" }, "optionalDependencies": { "@bitwarden/sdk-napi": "^1.0.0", "@libsql/client": "^0.15.7", "@tailwindcss/oxide": "^4.1.4", "better-sqlite3": "^11.8.1", "lightningcss": "^1.29.2", "react-devtools-core": "^6.1.1", "sharp": "^0.34.5" }, "bin": { "brain": "dist/brain.js" } }, "sha512-/9R4zO/P/UDl7IchxAdclFGAEi226duNJyOVXNb5Ms1CUWoxKA7EHOE4BCiV4SRMoT3tXIGT6dwAWjj0x8iA1Q=="],
+    "@rizom/brain": ["@rizom/brain@0.2.0-alpha.80", "", { "dependencies": { "@clack/prompts": "^0.11.0", "@modelcontextprotocol/sdk": "^1.24.0", "@tailwindcss/postcss": "^4.1.13", "@tailwindcss/typography": "^0.5.19", "postcss": "^8.5.6", "preact": "^10.27.2", "preact-render-to-string": "^6.3.1", "tailwindcss": "^4.1.11" }, "optionalDependencies": { "@bitwarden/sdk-napi": "^1.0.0", "@libsql/client": "^0.15.7", "@tailwindcss/oxide": "^4.1.4", "better-sqlite3": "^11.8.1", "lightningcss": "^1.29.2", "playwright-core": "^1.56.0", "react-devtools-core": "^6.1.1", "sharp": "^0.34.5" }, "bin": { "brain": "dist/brain.js" } }, "sha512-La0yUIqwd1tWXwUOmf5tsngHAhce68YiLT3H65MMIbiMIhpLgTkuTqC1g3S4w3XIwqrTGECmoTojFfKPSE9U/Q=="],
 
     "@tailwindcss/node": ["@tailwindcss/node@4.2.2", "", { "dependencies": { "@jridgewell/remapping": "^2.3.5", "enhanced-resolve": "^5.19.0", "jiti": "^2.6.1", "lightningcss": "1.32.0", "magic-string": "^0.30.21", "source-map-js": "^1.2.1", "tailwindcss": "4.2.2" } }, "sha512-pXS+wJ2gZpVXqFaUEjojq7jzMpTGf8rU6ipJz5ovJV6PUGmlJ+jvIwGrzdHdQ80Sg+wmQxUFuoW1UAAwHNEdFA=="],
 
@@ -385,6 +385,8 @@
     "picocolors": ["picocolors@1.1.1", "", {}, "sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA=="],
 
     "pkce-challenge": ["pkce-challenge@5.0.1", "", {}, "sha512-wQ0b/W4Fr01qtpHlqSqspcj3EhBvimsdh0KlHhH8HRZnMsEa0ea2fTULOXOS9ccQr3om+GcGRk4e+isrZWV8qQ=="],
+
+    "playwright-core": ["playwright-core@1.60.0", "", { "bin": { "playwright-core": "cli.js" } }, "sha512-9bW6zvX/m0lEbgTKJ6YppOKx8H3VOPBMOCFh2irXFOT4BbHgrx5hPjwJYLT40Lu+4qtD36qKc/Hn56StUW57IA=="],
 
     "postcss": ["postcss@8.5.9", "", { "dependencies": { "nanoid": "^3.3.11", "picocolors": "^1.1.1", "source-map-js": "^1.2.1" } }, "sha512-7a70Nsot+EMX9fFU3064K/kdHWZqGVY+BADLyXc8Dfv+mTLLVl6JzJpPaCZ2kQL9gIJvKXSLMHhqdRRjwQeFtw=="],
 

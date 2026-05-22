@@ -1,7 +1,7 @@
-import type { JSX } from "preact";
+import type { ComponentProps, JSX } from "preact";
 import { ProfessionalLayout } from "@rizom/brain/site";
 
-type LayoutProps = Parameters<typeof ProfessionalLayout>[0];
+type LayoutProps = ComponentProps<typeof ProfessionalLayout>;
 
 const wordmark = (
   <span className="inline-flex items-baseline font-heading font-medium text-[1.4rem] leading-none tracking-[-0.01em] [font-variation-settings:'opsz'_24,'SOFT'_50]">
