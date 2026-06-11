@@ -5,7 +5,7 @@
     "": {
       "name": "yeehaa-io",
       "dependencies": {
-        "@rizom/brain": "0.2.0-alpha.118"
+        "@rizom/brain": "0.2.0-alpha.118",
         "preact": "^10.27.2",
       },
       "devDependencies": {
