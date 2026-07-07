@@ -30,8 +30,6 @@ plugins:
       authToken: ${GIT_SYNC_TOKEN}
       authorName: Yeehaa
       authorEmail: yeehaa@rizom.ai
-  mcp:
-    authToken: ${MCP_AUTH_TOKEN}
   a2a:
     trustedTokens:
       ${A2A_TOKEN_PHONEY}: mylittlephoney
