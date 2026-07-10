@@ -16,6 +16,8 @@ anchors:
 
 # Plugin config
 plugins:
+  mcp:
+    mode: debug
   auth-service:
     setupEmail: ${SETUP_EMAIL_TO}
   email-resend:
