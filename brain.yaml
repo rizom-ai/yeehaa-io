@@ -30,11 +30,6 @@ plugins:
       authToken: ${GIT_SYNC_TOKEN}
       authorName: Yeehaa
       authorEmail: yeehaa@rizom.ai
-  a2a:
-    trustedTokens:
-      ${A2A_TOKEN_PHONEY}: mylittlephoney
-    outboundTokens:
-      mylittlephoney.com: ${A2A_OUTBOUND_TOKEN_PHONEY}
   discord:
     botToken: ${DISCORD_BOT_TOKEN}
   social-media:
@@ -49,7 +44,5 @@ plugins:
       siteTag: ${CLOUDFLARE_ANALYTICS_SITE_TAG}
 permissions:
   rules:
-    - pattern: "a2a:mylittlephoney"
-      level: trusted
     - pattern: "a2a:*"
       level: public
