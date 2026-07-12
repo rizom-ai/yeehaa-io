@@ -5,7 +5,7 @@
     "": {
       "name": "yeehaa-io",
       "dependencies": {
-        "@rizom/brain": "0.2.0-alpha.156",
+        "@rizom/brain": "0.2.0-alpha.157",
         "preact": "^10.27.2",
       },
       "devDependencies": {
@@ -128,7 +128,7 @@
 
     "@neon-rs/load": ["@neon-rs/load@0.0.4", "", {}, "sha512-kTPhdZyTQxB+2wpiRcFWrDcejc4JI6tkPuS7UZCG4l6Zvc5kU/gGQ/ozvHTh1XR5tS+UlfAfGuPajjzQjCiHCw=="],
 
-    "@rizom/brain": ["@rizom/brain@0.2.0-alpha.156", "", { "dependencies": { "@clack/prompts": "^1.5.1", "@modelcontextprotocol/sdk": "^1.29.0", "@tailwindcss/postcss": "^4.3.1", "@tailwindcss/typography": "^0.5.20", "postcss": "^8.5.15", "preact": "^10.27.2", "preact-render-to-string": "^6.7.0", "tailwindcss": "^4.3.1", "zod": "^4.1.8" }, "optionalDependencies": { "@bitwarden/sdk-napi": "^1.0.0", "@libsql/client": "^0.17.4", "@tailwindcss/oxide": "^4.1.4", "lightningcss": "^1.29.2", "playwright-core": "^1.61.0", "react-devtools-core": "^7.0.1", "sharp": "^0.35.1" }, "bin": { "brain": "dist/brain.js" } }, "sha512-0BCq5QC+X+RCIxLDGYBw/fC6zTP8b4wQhx5y3NBYvrjthx0woUDSrCFz3XQxIjpAqB8BHvNM7OUpH0YigdEqeg=="],
+    "@rizom/brain": ["@rizom/brain@0.2.0-alpha.157", "", { "dependencies": { "@clack/prompts": "^1.5.1", "@modelcontextprotocol/sdk": "^1.29.0", "@tailwindcss/postcss": "^4.3.1", "@tailwindcss/typography": "^0.5.20", "postcss": "^8.5.15", "preact": "^10.27.2", "preact-render-to-string": "^6.7.0", "tailwindcss": "^4.3.1", "zod": "^4.1.8" }, "optionalDependencies": { "@bitwarden/sdk-napi": "^1.0.0", "@libsql/client": "^0.17.4", "@tailwindcss/oxide": "^4.1.4", "lightningcss": "^1.29.2", "playwright-core": "^1.61.0", "react-devtools-core": "^7.0.1", "sharp": "^0.35.1" }, "bin": { "brain": "dist/brain.js" } }, "sha512-Eqol/HG6vj16ZhN/bNVMzdhgFbxunxfj38kSDPL/Xm2/9pDDf5uqcErtPsQND9eMORcWEqL4tGDVKQKzt/1dQQ=="],
 
     "@tailwindcss/node": ["@tailwindcss/node@4.3.2", "", { "dependencies": { "@jridgewell/remapping": "^2.3.5", "enhanced-resolve": "5.21.6", "jiti": "^2.7.0", "lightningcss": "1.32.0", "magic-string": "^0.30.21", "source-map-js": "^1.2.1", "tailwindcss": "4.3.2" } }, "sha512-yWP/sqEcBLaD8JuA6zNwxoYKr75qxTioYwlRwekj5Jr/I5GXnoJfjetH/psLUIv74cYTH2lBUEzBkinthoYcBg=="],
 
