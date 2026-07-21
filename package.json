@@ -8,7 +8,7 @@
     "start:bitwarden": "bunx varlock@1.1.0 run --path ./ -- bunx brain start"
   },
   "dependencies": {
-    "@rizom/brain": "0.2.0-alpha.204",
+    "@rizom/brain": "0.2.0-alpha.206",
     "preact": "^10.27.2"
   },
   "devDependencies": {
