@@ -18,6 +18,11 @@ anchors:
 plugins:
   mcp:
     mode: debug
+  topics:
+    # High-signal public knowledge map: entity packages define default
+    # projectionSourceRole; this instance tightens topic budget/creation.
+    topicSoftCeilingSourceRatio: 10
+    createRelevanceThreshold: 0.85
   auth-service:
     setupEmail: ${SETUP_EMAIL_TO}
   email-resend:
