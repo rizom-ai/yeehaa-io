@@ -16,6 +16,10 @@ anchors:
 
 # Plugin config
 plugins:
+  atproto:
+    identifier: did:plc:dtxrise7xa4kat6mh4zd4lqe
+    accountDid: did:plc:dtxrise7xa4kat6mh4zd4lqe
+    appPassword: ${ATPROTO_APP_PASSWORD}
   mcp:
     mode: debug
   topics:
