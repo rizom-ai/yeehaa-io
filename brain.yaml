@@ -6,6 +6,9 @@ domain: yeehaa.io
 preset: full
 add:
   - rizom-ecosystem
+  - chat
+remove:
+  - discord
 
 # Local src/site.ts and src/theme.css provide the site and theme via the
 # standalone conventions.
