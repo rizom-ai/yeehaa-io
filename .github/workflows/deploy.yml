@@ -209,6 +209,49 @@ jobs:
           PREVIEW_DOMAIN: ${{ env.PREVIEW_DOMAIN }}
         run: kamal setup --skip-push
 
+      - name: Verify passkey setup delivery
+        env:
+          SERVER_IP: ${{ steps.provision.outputs.server_ip }}
+        run: |
+          for attempt in $(seq 1 24); do
+            AUTH_BODY=$(curl -sk --max-time 10 --resolve "$BRAIN_DOMAIN:443:$SERVER_IP" \
+              -X POST "https://$BRAIN_DOMAIN/webauthn/auth/options" \
+              -H "content-type: application/json" -d '{}' || true)
+            if echo "$AUTH_BODY" | grep -q '"challenge"'; then
+              echo "Passkey setup is already complete."
+              exit 0
+            fi
+            if echo "$AUTH_BODY" | grep -q 'No passkey registered' && cat <<'BUN' | ssh "root@$SERVER_IP" '
+              CONTAINER=$(docker ps --filter "label=service=brain" --filter "label=role=web" --format "{{.ID}}" | head -1)
+              test -n "$CONTAINER"
+              docker exec -i "$CONTAINER" bun run -
+            '
+          import { createClient } from "@libsql/client";
+
+          const client = createClient({ url: "file:/app/data/auth/auth.db" });
+          const result = await client.execute(`
+            SELECT COUNT(*) AS delivery_count
+            FROM setup_token_deliveries AS deliveries
+            INNER JOIN setup_tokens AS tokens
+              ON tokens.token_hash = deliveries.token_hash
+            WHERE tokens.target_user_id IS NULL
+              AND tokens.consumed_at IS NULL
+              AND tokens.expires_at > unixepoch()
+          `);
+          const count = Number(result.rows[0]?.["delivery_count"] ?? 0);
+          client.close();
+          if (count < 1) process.exit(1);
+          BUN
+            then
+              echo "Passkey setup email provider acceptance confirmed."
+              exit 0
+            fi
+            echo "Waiting for passkey setup or provider acceptance ($attempt/24)..."
+            sleep 5
+          done
+          echo "Passkey setup is incomplete and email provider acceptance was not recorded." >&2
+          exit 1
+
       - name: Verify origin TLS
         env:
           SERVER_IP: ${{ steps.provision.outputs.server_ip }}
