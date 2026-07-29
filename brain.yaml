@@ -41,8 +41,12 @@ plugins:
       authToken: ${GIT_SYNC_TOKEN}
       authorName: Yeehaa
       authorEmail: yeehaa@rizom.ai
-  discord:
-    botToken: ${DISCORD_BOT_TOKEN}
+  chat:
+    adapters:
+      discord:
+        botToken: ${DISCORD_BOT_TOKEN}
+        publicKey: ${DISCORD_PUBLIC_KEY}
+        applicationId: ${DISCORD_APPLICATION_ID}
   social-media:
     linkedin:
       accessToken: ${LINKEDIN_ACCESS_TOKEN}
