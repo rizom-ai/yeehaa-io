@@ -28,6 +28,10 @@ plugins:
   topics:
     # High-signal public knowledge map: entity packages define default
     # projectionSourceRole; this instance tightens topic budget/creation.
+    # SWOT is derived from skills, so feeding it back into topic extraction
+    # creates a topic -> skill -> SWOT -> topic projection cycle.
+    excludeEntityTypes:
+      - swot
     topicSoftCeilingSourceRatio: 10
     createRelevanceThreshold: 0.85
   auth-service:
