@@ -1,17 +1,23 @@
-brain: rover
+brain: brain
+anchor: person
+kind: professional
 domain: yeehaa.io
 
-# Plugin preset — "core" is the minimal on-ramp. Use "default" or "full"
-# for richer presets, or list capability ids in add: / remove: to fine-tune.
-preset: full
+# Canonical capability bundles replace the legacy model/preset selection.
+bundles:
+  - core
+  - site
+  - publishing
 add:
   - rizom-ecosystem
-  - chat
+  - obsidian-vault
 remove:
-  - discord
+  - chat
 
-# Local src/site.ts and src/theme.css provide the site and theme via the
-# standalone conventions.
+# Local src/site.ts remains the site package. Keep the existing base theme
+# explicit so the canonical runtime preserves the deployed presentation.
+site:
+  theme: "@rizom/theme-default"
 
 # Permissions
 anchors:
@@ -43,6 +49,7 @@ plugins:
     passkeyLogin:
       contentRepoToken: ${CMS_CONTENT_REPO_PAT}
   directory-sync:
+    seedContentPath: ./seed-content
     git:
       repo: rizom-ai/professional-brain-content
       authToken: ${GIT_SYNC_TOKEN}
