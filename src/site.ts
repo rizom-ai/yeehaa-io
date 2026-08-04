@@ -1,8 +1,4 @@
-import {
-  professionalRoutes,
-  type RouteDefinitionInput,
-  type SitePackage,
-} from "@rizom/brain/site";
+import { professionalRoutes, type SitePackage } from "@rizom/brain/site";
 import { YeehaaLayout } from "./layout";
 
 /**
@@ -11,29 +7,11 @@ import { YeehaaLayout } from "./layout";
  * Mirrors the old monorepo `@brains/site-yeehaa` package while using the
  * standalone local site convention.
  */
-const routes: RouteDefinitionInput[] = professionalRoutes.map(
-  (route): RouteDefinitionInput => {
-    if (route.id !== "home") return route;
-
-    return {
-      ...route,
-      sections: [
-        ...(route.sections ?? []),
-        {
-          id: "ecosystem",
-          template: "rizom-ecosystem:ecosystem",
-          dataQuery: { query: { id: "rizom-ecosystem" } },
-        },
-      ],
-    };
-  },
-);
-
 const site = {
   layouts: {
     default: YeehaaLayout,
   },
-  routes,
+  routes: professionalRoutes,
   entityDisplay: {
     post: { label: "Essay" },
     deck: { label: "Presentation" },
