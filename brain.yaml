@@ -14,9 +14,10 @@ add:
 remove:
   - chat
 
-# Local src/site.ts remains the site package. Keep the existing base theme
-# explicit so the canonical runtime preserves the deployed presentation.
+# Local src/site.ts layers over the shipped site package. Keep the structural
+# base and theme explicit so canonical rebuilds preserve the deployed site.
 site:
+  package: "@brains/site-default"
   theme: "@rizom/theme-default"
 
 # Permissions
