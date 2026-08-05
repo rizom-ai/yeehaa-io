@@ -13,9 +13,21 @@ const site = {
   },
   routes: professionalRoutes,
   entityDisplay: {
-    post: { label: "Essay" },
-    deck: { label: "Presentation" },
-    project: { label: "Project" },
+    // Primary nav order. Entity nav items default to priority 40 and would
+    // otherwise fall back to registration order; Agents stays at the default
+    // and About sits at 90.
+    post: {
+      label: "Essay",
+      navigation: { priority: 10 },
+    },
+    project: {
+      label: "Project",
+      navigation: { priority: 20 },
+    },
+    deck: {
+      label: "Presentation",
+      navigation: { priority: 30 },
+    },
     series: {
       label: "Series",
       navigation: { slot: "secondary" },
