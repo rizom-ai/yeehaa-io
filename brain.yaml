@@ -9,10 +9,9 @@ bundles:
   - site
   - publishing
 add:
-  - rizom-ecosystem
   - obsidian-vault
 
-# Local src/site.ts layers over the shipped site package. Keep the structural
+# Local src/site.tsx layers over the shipped site package. Keep the structural
 # base and theme explicit so canonical rebuilds preserve the deployed site.
 site:
   package: "@brains/site-default"

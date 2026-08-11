@@ -1,17 +1,13 @@
-import { professionalRoutes, type SitePackage } from "@rizom/brain/site";
-import { YeehaaLayout } from "./layout";
+import type { SiteDefinitionOverrides } from "@rizom/site";
 
 /**
  * Local yeehaa site.
  *
- * Mirrors the old monorepo `@brains/site-yeehaa` package while using the
- * standalone local site convention.
+ * Layers Yeehaa's entity labels and navigation order over the explicit
+ * `@brains/site-default` base selected in brain.yaml. The base continues to
+ * own the professional routes and layout.
  */
 const site = {
-  layouts: {
-    default: YeehaaLayout,
-  },
-  routes: professionalRoutes,
   entityDisplay: {
     // Primary nav order. Entity nav items default to priority 40 and would
     // otherwise fall back to registration order; Agents stays at the default
@@ -54,6 +50,6 @@ const site = {
       navigation: { slot: "secondary" },
     },
   },
-} satisfies Partial<SitePackage>;
+} satisfies SiteDefinitionOverrides;
 
 export default site;
