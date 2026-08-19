@@ -1,0 +1,81 @@
+brain: brain
+anchor: person
+kind: professional
+domain: yeehaa.io
+
+# Canonical capability bundles replace the legacy model/preset selection.
+bundles:
+  - core
+  - media
+  - automation
+  - web
+  - chat
+  - site
+  - publishing
+  - federation
+add:
+  - obsidian-vault
+
+# Local src/site.tsx layers over the shipped site package. Keep the structural
+# base and theme explicit so canonical rebuilds preserve the deployed site.
+site:
+  package: "@brains/site-default"
+  theme: "@rizom/theme-default"
+
+# Permissions
+anchors:
+  - "discord:1442828818493735015"
+
+# Plugin config
+plugins:
+  atproto:
+    identifier: did:plc:dtxrise7xa4kat6mh4zd4lqe
+    accountDid: did:plc:dtxrise7xa4kat6mh4zd4lqe
+    appPassword: ${ATPROTO_APP_PASSWORD}
+  mcp:
+    mode: debug
+  topics:
+    # High-signal public knowledge map: entity packages define default
+    # projectionSourceRole; this instance tightens topic budget/creation.
+    # SWOT is derived from skills, so feeding it back into topic extraction
+    # creates a topic -> skill -> SWOT -> topic projection cycle.
+    excludeEntityTypes:
+      - swot
+    topicSoftCeilingSourceRatio: 10
+    createRelevanceThreshold: 0.85
+  auth-service:
+    setupEmail: ${SETUP_EMAIL_TO}
+  email:
+    apiKey: ${SETUP_EMAIL_API_KEY}
+    from: ${SETUP_EMAIL_FROM}
+  cms:
+    passkeyLogin:
+      contentRepoToken: ${CMS_CONTENT_REPO_PAT}
+  directory-sync:
+    seedContentPath: ./seed-content
+    git:
+      repo: rizom-ai/professional-brain-content
+      authToken: ${GIT_SYNC_TOKEN}
+      authorName: Yeehaa
+      authorEmail: yeehaa@rizom.ai
+  chat:
+    adapters:
+      discord:
+        botToken: ${DISCORD_BOT_TOKEN}
+        publicKey: ${DISCORD_PUBLIC_KEY}
+        applicationId: ${DISCORD_APPLICATION_ID}
+  social-media:
+    linkedin:
+      accessToken: ${LINKEDIN_ACCESS_TOKEN}
+  newsletter:
+    apiKey: ${BUTTONDOWN_API_KEY}
+  analytics:
+    cloudflare:
+      accountId: ${CLOUDFLARE_ACCOUNT_ID}
+      apiToken: ${CLOUDFLARE_API_TOKEN}
+      siteTag: ${CLOUDFLARE_ANALYTICS_SITE_TAG}
+permissions:
+  rules:
+    - pattern: "a2a:*"
+      level: public
+bundleContract: capability-bundles-v1
