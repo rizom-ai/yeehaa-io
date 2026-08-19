@@ -2,6 +2,7 @@
   "name": "yeehaa-io",
   "private": true,
   "type": "module",
+  "packageManager": "bun@1.4.0",
   "scripts": {
     "typecheck": "tsc --noEmit",
     "start": "bunx brain start",

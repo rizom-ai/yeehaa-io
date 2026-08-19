@@ -1,5 +1,11 @@
 import { describe, expect, it } from "bun:test";
 
+const packageConfig = (await Bun.file(
+  new URL("../package.json", import.meta.url),
+).json()) as Record<string, unknown>;
+const dockerfile = await Bun.file(
+  new URL("../deploy/Dockerfile", import.meta.url),
+).text();
 const deployConfig = await Bun.file(
   new URL("../config/deploy.yml", import.meta.url),
 ).text();
@@ -24,6 +30,12 @@ const ciWorkflowText = await Bun.file(ciWorkflowPath).text();
 const ciWorkflowConfig = Bun.YAML.parse(ciWorkflowText) as Record<string, any>;
 
 describe("deployment runtime storage", () => {
+  it("uses one reviewed Bun version for development, CI, and runtime", () => {
+    expect(packageConfig["packageManager"]).toBe("bun@1.4.0");
+    expect(ciWorkflowText).toContain("bun-version: 1.4.0");
+    expect(dockerfile).toContain("ARG BUN_VERSION=1.4.0");
+  });
+
   it("persists auth state outside disposable containers", () => {
     expect(deployConfig).toContain("- /opt/brain-runtime:/app/data");
   });
