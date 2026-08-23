@@ -7,6 +7,8 @@
 - Legacy source and rollback revision: `795236e3f4ef98cdd57132f4dcbb60008ca3439b`.
 - Unified package source merge: `rizom-ai/brains@6f83679fe358ff169e1ce5f25ead6b9e9388523f`.
 - Unified package version commit / npm `gitHead`: `rizom-ai/brains@b022fa168b328de678e2856f85b008065044d48b`.
+- Execution content commit: `6778f4546921cc27a364a1e8de7e8089bd53e550`.
+- Secret-free review diff SHA-256 (excluding this evidence record): `cfba4eaa14343c64f8c453a5270e92757679dda2d80bc6f1a4a8f26b96828539`.
 - Reviewed migration target SHA-256: `0c25df387764a8a1fd0ed376d05224afd179bbd7ae4bc9d79dd57f1caac3cf76`.
 - The active branch config exactly matches `migration/capability-bundles-v1/brain.yaml`.
 - Domain, profile kind, anchor, structural site and theme, permissions, additions, all 11 plugin blocks, and secret selectors are unchanged.
