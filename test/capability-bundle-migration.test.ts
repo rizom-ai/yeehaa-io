@@ -1,26 +1,19 @@
 import { describe, expect, it } from "bun:test";
 
-const source = Bun.YAML.parse(
+const active = Bun.YAML.parse(
   await Bun.file(new URL("../brain.yaml", import.meta.url)).text(),
 ) as Record<string, unknown>;
-const target = Bun.YAML.parse(
+const reviewedTarget = Bun.YAML.parse(
   await Bun.file(
     new URL("../migration/capability-bundles-v1/brain.yaml", import.meta.url),
   ).text(),
 ) as Record<string, unknown>;
 
-describe("capability-bundle migration target", () => {
-  it("changes only the reviewed composition contract", () => {
-    const { bundles: sourceBundles, ...sourceInstance } = source;
-    const {
-      bundleContract,
-      bundles: targetBundles,
-      ...targetInstance
-    } = target;
-
-    expect(sourceBundles).toEqual(["core", "site", "publishing"]);
-    expect(bundleContract).toBe("capability-bundles-v1");
-    expect(targetBundles).toEqual([
+describe("active capability-bundle contract", () => {
+  it("exactly matches the reviewed professional migration target", () => {
+    expect(active).toEqual(reviewedTarget);
+    expect(active["bundleContract"]).toBe("capability-bundles-v1");
+    expect(active["bundles"]).toEqual([
       "core",
       "media",
       "automation",
@@ -30,14 +23,13 @@ describe("capability-bundle migration target", () => {
       "publishing",
       "federation",
     ]);
-    expect(targetInstance).toEqual(sourceInstance);
   });
 
   it("preserves every configured plugin block", () => {
-    const sourcePlugins = source["plugins"] as Record<string, unknown>;
-    const targetPlugins = target["plugins"] as Record<string, unknown>;
+    const activePlugins = active["plugins"] as Record<string, unknown>;
+    const targetPlugins = reviewedTarget["plugins"] as Record<string, unknown>;
 
-    expect(Object.keys(sourcePlugins)).toHaveLength(11);
-    expect(targetPlugins).toEqual(sourcePlugins);
+    expect(Object.keys(activePlugins)).toHaveLength(11);
+    expect(activePlugins).toEqual(targetPlugins);
   });
 });

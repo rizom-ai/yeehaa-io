@@ -6,8 +6,13 @@ domain: yeehaa.io
 # Canonical capability bundles replace the legacy model/preset selection.
 bundles:
   - core
+  - media
+  - automation
+  - web
+  - chat
   - site
   - publishing
+  - federation
 add:
   - obsidian-vault
 
@@ -73,3 +78,4 @@ permissions:
   rules:
     - pattern: "a2a:*"
       level: public
+bundleContract: capability-bundles-v1

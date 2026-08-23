@@ -32,8 +32,21 @@ const ciWorkflowConfig = Bun.YAML.parse(ciWorkflowText) as Record<string, any>;
 describe("deployment runtime storage", () => {
   it("uses one reviewed Bun version for development, CI, and runtime", () => {
     expect(packageConfig["packageManager"]).toBe("bun@1.4.0");
+    expect(packageConfig).toMatchObject({
+      dependencies: { "@rizom/brain": "0.2.0-alpha.319" },
+    });
     expect(ciWorkflowText).toContain("bun-version: 1.4.0");
     expect(dockerfile).toContain("ARG BUN_VERSION=1.4.0");
+    expect(dockerfile).toContain(
+      "oven/bun:${BUN_VERSION}-slim@sha256:e0ee68d16ccb9927bf02aa7dd8fd4bf3369ee6d46da04faa72b05ce8bfd135f6",
+    );
+  });
+
+  it("installs the exact locked production graph", () => {
+    expect(dockerfile).toContain("COPY package.json bun.lock ./");
+    expect(dockerfile).toContain(
+      "bun install --production --frozen-lockfile --ignore-scripts",
+    );
   });
 
   it("persists auth state outside disposable containers", () => {
