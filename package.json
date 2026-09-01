@@ -2,6 +2,7 @@
   "name": "yeehaa-io",
   "private": true,
   "type": "module",
+  "packageManager": "bun@1.4.0",
   "scripts": {
     "typecheck": "tsc --noEmit",
     "start": "bunx brain start",
@@ -9,13 +10,16 @@
     "start:bitwarden": "bunx varlock@1.1.0 run --path ./ -- bunx brain start"
   },
   "dependencies": {
-    "@rizom/brain": "0.2.0-alpha.278",
-    "@rizom/site": "0.2.0-alpha.233",
-    "preact": "^10.27.2"
+    "@rizom/brain": "0.2.0-alpha.343",
+    "@rizom/site": "0.2.0-alpha.235",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
   },
   "devDependencies": {
     "@types/bun": "^1.3.14",
     "@types/node": "^25.6.0",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.0.3",
     "typescript": "^7.0.2"
   }
 }

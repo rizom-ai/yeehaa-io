@@ -1,5 +1,5 @@
-ARG BUN_VERSION=1.3.10
-FROM oven/bun:${BUN_VERSION}-slim AS runtime
+ARG BUN_VERSION=1.4.0
+FROM oven/bun:${BUN_VERSION}-slim@sha256:e0ee68d16ccb9927bf02aa7dd8fd4bf3369ee6d46da04faa72b05ce8bfd135f6 AS runtime
 
 LABEL ai.rizom.brain.watchdog="true"
 
@@ -24,8 +24,8 @@ CMD ["bun", "./node_modules/@rizom/brain/dist/brain.js", "start"]
 
 # --- standalone: bake full project into image (brain-cli deploy) ---
 FROM runtime AS standalone
-COPY package.json ./package.json
-RUN bun install --production --ignore-scripts
+COPY package.json bun.lock ./
+RUN bun install --production --frozen-lockfile --ignore-scripts
 RUN bunx playwright-core install --with-deps chromium-headless-shell \
  && rm -rf /var/lib/apt/lists/* /tmp/*
 COPY . .
