@@ -65,6 +65,22 @@ describe("deployment runtime storage", () => {
     );
   });
 
+  it("pins the confirmed post-reprovision SSH host identity", async () => {
+    const expectedHostKey = (
+      await Bun.file(
+        new URL("../deploy/ssh-host-key.sha256", import.meta.url),
+      ).text()
+    ).trim();
+    expect(expectedHostKey).toBe(
+      "SHA256:O4H13ugPhbYit8qcs5CKaXCdZInFaYLlWgEU88YH9O4",
+    );
+    expect(deployWorkflow).toContain("Verify SSH host identity");
+    expect(deployWorkflow).toContain("deploy/ssh-host-key.sha256");
+    expect(deployWorkflow).toContain("StrictHostKeyChecking yes");
+    expect(deployWorkflow).not.toContain("StrictHostKeyChecking no");
+    expect(deployWorkflow).not.toContain("UserKnownHostsFile /dev/null");
+  });
+
   it("gates replacement on the released canonical backup command", async () => {
     const backupScript = Bun.file(
       new URL("../deploy/scripts/create-predeploy-backup.ts", import.meta.url),

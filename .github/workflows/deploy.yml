@@ -111,8 +111,8 @@ jobs:
             IdentitiesOnly yes
             BatchMode yes
             ConnectTimeout 5
-            StrictHostKeyChecking no
-            UserKnownHostsFile /dev/null
+            StrictHostKeyChecking yes
+            UserKnownHostsFile ~/.ssh/known_hosts
           EOF
           chmod 600 ~/.ssh/config
 
@@ -185,6 +185,32 @@ jobs:
 
       - name: Validate SSH key
         run: ssh-keygen -y -f ~/.ssh/id_ed25519 >/dev/null
+
+      - name: Verify SSH host identity
+        env:
+          SERVER_IP: ${{ steps.provision.outputs.server_ip }}
+        run: |
+          expected="$(tr -d '\r\n' < deploy/ssh-host-key.sha256)"
+          scanned=""
+          for attempt in $(seq 1 18); do
+            scanned="$(ssh-keyscan -T 5 -t ed25519 "$SERVER_IP" 2>/dev/null || true)"
+            if [ -n "$scanned" ]; then
+              break
+            fi
+            echo "SSH host key not available yet (attempt $attempt/18); retrying in 5s..."
+            sleep 5
+          done
+          if [ -z "$scanned" ]; then
+            echo "Could not retrieve the SSH host key for $SERVER_IP." >&2
+            exit 1
+          fi
+          actual="$(printf '%s\n' "$scanned" | ssh-keygen -lf - | awk 'NR == 1 {print $2}')"
+          if [ "$actual" != "$expected" ]; then
+            echo "SSH host identity mismatch for $SERVER_IP: expected $expected, received $actual" >&2
+            exit 1
+          fi
+          printf '%s\n' "$scanned" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
 
       - name: Wait for SSH access
         env:
