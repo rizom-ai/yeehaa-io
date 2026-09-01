@@ -25,11 +25,15 @@ describe("active capability-bundle contract", () => {
     ]);
   });
 
-  it("preserves every configured plugin block", () => {
+  it("preserves every configured plugin block under the alpha.341 names", () => {
     const activePlugins = active["plugins"] as Record<string, unknown>;
     const targetPlugins = reviewedTarget["plugins"] as Record<string, unknown>;
 
     expect(Object.keys(activePlugins)).toHaveLength(11);
     expect(activePlugins).toEqual(targetPlugins);
+    expect(activePlugins["studio"]).toEqual({
+      passkeyLogin: { contentRepoToken: "${CMS_CONTENT_REPO_PAT}" },
+    });
+    expect(activePlugins["cms"]).toBeUndefined();
   });
 });

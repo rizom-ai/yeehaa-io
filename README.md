@@ -39,8 +39,8 @@ bun run start:bitwarden
 ## What's here
 
 - `brain.yaml` — instance configuration (model, plugins, secrets, permissions)
-- `package.json` — pins `@rizom/brain` and `preact` for module resolution
-- `tsconfig.json` — JSX runtime hint (Preact)
+- `package.json` — pins `@rizom/brain`, `@rizom/site`, React, and React DOM for module resolution
+- `tsconfig.json` — JSX runtime hint (React)
 - `.env` — optional local secrets override (gitignored, copy from `.env.example`)
 - `.env.schema` — canonical secret schema, with Bitwarden-backed values via Varlock
 - `brain-data/` — content (created on first sync, gitignored by default)
