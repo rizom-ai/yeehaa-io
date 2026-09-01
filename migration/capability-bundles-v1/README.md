@@ -11,7 +11,7 @@ canonical anchor, and applies alpha.341's canonical `cms` to `studio` plugin ren
 
 The paired runtime inputs are exact:
 
-- `@rizom/brain@0.2.0-alpha.341`;
+- `@rizom/brain@0.2.0-alpha.343`;
 - React-compatible authoring packages: `@rizom/site@0.2.0-alpha.235`,
   `react@^19.2.7`, and `react-dom@^19.2.7`;
 - Bun `1.4.0-slim` at

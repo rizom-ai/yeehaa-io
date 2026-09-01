@@ -5,7 +5,7 @@
     "": {
       "name": "yeehaa-io",
       "dependencies": {
-        "@rizom/brain": "0.2.0-alpha.341",
+        "@rizom/brain": "0.2.0-alpha.343",
         "@rizom/site": "0.2.0-alpha.235",
         "react": "^19.2.7",
         "react-dom": "^19.2.7",
@@ -80,7 +80,7 @@
 
     "@neon-rs/load": ["@neon-rs/load@0.0.4", "", {}, "sha512-kTPhdZyTQxB+2wpiRcFWrDcejc4JI6tkPuS7UZCG4l6Zvc5kU/gGQ/ozvHTh1XR5tS+UlfAfGuPajjzQjCiHCw=="],
 
-    "@rizom/brain": ["@rizom/brain@0.2.0-alpha.341", "", { "dependencies": { "@clack/prompts": "^1.5.1", "@modelcontextprotocol/client": "^2.0.0", "@modelcontextprotocol/server": "^2.0.0", "@tailwindcss/postcss": "^4.3.1", "@tailwindcss/typography": "^0.5.20", "postcss": "^8.5.15", "react": "^19.2.7", "react-dom": "^19.2.7", "tailwindcss": "^4.3.1", "yaml": "^2.9.0", "zod": "^4.2.0" }, "optionalDependencies": { "@bitwarden/sdk-napi": "^1.0.0", "@libsql/client": "^0.17.4", "@tailwindcss/oxide": "^4.1.4", "lightningcss": "^1.29.2", "react-devtools-core": "^7.0.1" }, "bin": { "brain": "dist/brain.js" } }, "sha512-eZH13vnLVwbnNrnYdchLy6031WMFobHCQ+PfK8QchMu38FesILk9uFU0cddOCFVB5M9Y3pIMcePuRwZBAyNrcA=="],
+    "@rizom/brain": ["@rizom/brain@0.2.0-alpha.343", "", { "dependencies": { "@clack/prompts": "^1.5.1", "@modelcontextprotocol/client": "^2.0.0", "@modelcontextprotocol/server": "^2.0.0", "@tailwindcss/postcss": "^4.3.1", "@tailwindcss/typography": "^0.5.20", "postcss": "^8.5.15", "react": "^19.2.7", "react-dom": "^19.2.7", "tailwindcss": "^4.3.1", "yaml": "^2.9.0", "zod": "^4.2.0" }, "optionalDependencies": { "@bitwarden/sdk-napi": "^1.0.0", "@libsql/client": "^0.17.4", "@tailwindcss/oxide": "^4.1.4", "lightningcss": "^1.29.2", "react-devtools-core": "^7.0.1" }, "bin": { "brain": "dist/brain.js" } }, "sha512-rfkIpFR2y/Z4DQ8/fvetSNkpmRXbdCbbaeXPOSVt6T8AtfjhYNMT/e4UVtTnLMY4qRRH/pYNwYjNc+NYvmODeg=="],
 
     "@rizom/site": ["@rizom/site@0.2.0-alpha.235", "", { "dependencies": { "zod": "^4.2.0" }, "peerDependencies": { "react": "^19.2.7", "react-dom": "^19.2.7" } }, "sha512-cPqNv/FtiJaevsMPccpY8G3dFkQwjsLaP2pWCk1u9sDELIT1PxUMr1xdr+9+L98FgKByz+xCbOqfbemcLXcsFg=="],
 

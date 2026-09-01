@@ -37,7 +37,7 @@ describe("deployment runtime storage", () => {
     expect(packageConfig["packageManager"]).toBe("bun@1.4.0");
     expect(packageConfig).toMatchObject({
       dependencies: {
-        "@rizom/brain": "0.2.0-alpha.341",
+        "@rizom/brain": "0.2.0-alpha.343",
         "@rizom/site": "0.2.0-alpha.235",
         react: "^19.2.7",
         "react-dom": "^19.2.7",
@@ -63,6 +63,24 @@ describe("deployment runtime storage", () => {
     expect(dockerfile).toContain(
       "bun install --production --frozen-lockfile --ignore-scripts",
     );
+  });
+
+  it("gates replacement on the released canonical backup command", async () => {
+    const backupScript = Bun.file(
+      new URL("../deploy/scripts/create-predeploy-backup.ts", import.meta.url),
+    );
+    expect(await backupScript.exists()).toBe(true);
+    const backupSource = await backupScript.text();
+    expect(backupSource).toContain("brains-predeploy-backup-v1");
+    expect(backupSource).toContain("VACUUM INTO");
+    expect(backupSource).toContain("content-untracked.tar");
+    const sshIndex = deployWorkflow.indexOf("- name: Wait for SSH access");
+    const backupIndex = deployWorkflow.indexOf(
+      "bun deploy/scripts/create-predeploy-backup.ts",
+    );
+    const deployIndex = deployWorkflow.indexOf("kamal setup --skip-push");
+    expect(backupIndex).toBeGreaterThan(sshIndex);
+    expect(deployIndex).toBeGreaterThan(backupIndex);
   });
 
   it("persists auth state outside disposable containers", () => {

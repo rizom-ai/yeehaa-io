@@ -25,7 +25,7 @@ describe("active capability-bundle contract", () => {
     ]);
   });
 
-  it("preserves every configured plugin block under the alpha.341 names", () => {
+  it("preserves every configured plugin block under the canonical names", () => {
     const activePlugins = active["plugins"] as Record<string, unknown>;
     const targetPlugins = reviewedTarget["plugins"] as Record<string, unknown>;
 
