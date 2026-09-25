@@ -44,6 +44,8 @@ plugins:
         origin: "https://yeehaa.io"
         maxBodyBytes: 8192
         readTimeoutMs: 5000
+        # Kamal terminates TLS and forwards plain HTTP on the private network.
+        trustForwardedProto: true
       admission:
         windowSeconds: 3600
         globalRequests: 300
