@@ -5,7 +5,7 @@
     "": {
       "name": "yeehaa-io",
       "dependencies": {
-        "@rizom/brain": "0.2.0-alpha.408",
+        "@rizom/brain": "0.2.0-alpha.409",
         "@rizom/site": "0.2.0-alpha.235",
         "react": "^19.2.7",
         "react-dom": "^19.2.7",
@@ -80,7 +80,7 @@
 
     "@neon-rs/load": ["@neon-rs/load@0.0.4", "", {}, "sha512-kTPhdZyTQxB+2wpiRcFWrDcejc4JI6tkPuS7UZCG4l6Zvc5kU/gGQ/ozvHTh1XR5tS+UlfAfGuPajjzQjCiHCw=="],
 
-    "@rizom/brain": ["@rizom/brain@0.2.0-alpha.408", "", { "dependencies": { "@clack/prompts": "^1.5.1", "@modelcontextprotocol/client": "^2.0.0", "@modelcontextprotocol/server": "^2.0.0", "@tailwindcss/postcss": "^4.3.1", "@tailwindcss/typography": "^0.5.20", "@types/react": "^19.2.17", "postcss": "^8.5.15", "react": "^19.2.7", "react-dom": "^19.2.7", "tailwindcss": "^4.3.1", "yaml": "^2.9.0", "zod": "^4.2.0" }, "optionalDependencies": { "@bitwarden/sdk-napi": "^1.0.0", "@libsql/client": "^0.17.4", "@tailwindcss/oxide": "^4.1.4", "lightningcss": "^1.29.2", "react-devtools-core": "^7.0.1" }, "bin": { "brain": "dist/brain.js" } }, "sha512-sjuTyE++DENW08QdNDd/7UV9hSuaTe3SdFP16FmxaSIH+5cf7vsiUa4CIrgyggCv9zegJlCE2wC/xCehbwb1JA=="],
+    "@rizom/brain": ["@rizom/brain@0.2.0-alpha.409", "", { "dependencies": { "@clack/prompts": "^1.5.1", "@modelcontextprotocol/client": "^2.0.0", "@modelcontextprotocol/server": "^2.0.0", "@tailwindcss/postcss": "^4.3.1", "@tailwindcss/typography": "^0.5.20", "@types/react": "^19.2.17", "postcss": "^8.5.15", "react": "^19.2.7", "react-dom": "^19.2.7", "tailwindcss": "^4.3.1", "yaml": "^2.9.0", "zod": "^4.2.0" }, "optionalDependencies": { "@bitwarden/sdk-napi": "^1.0.0", "@libsql/client": "^0.17.4", "@tailwindcss/oxide": "^4.1.4", "lightningcss": "^1.29.2", "react-devtools-core": "^7.0.1" }, "bin": { "brain": "dist/brain.js" } }, "sha512-/2j9Bcy//gPrmXEroYUeBSURiY4LhPFPDzHjhAZc7kVDI8XwKSAgqxMzPEY5HjbF6bZ0zBD28irpctxohM9rxQ=="],
 
     "@rizom/site": ["@rizom/site@0.2.0-alpha.235", "", { "dependencies": { "zod": "^4.2.0" }, "peerDependencies": { "react": "^19.2.7", "react-dom": "^19.2.7" } }, "sha512-cPqNv/FtiJaevsMPccpY8G3dFkQwjsLaP2pWCk1u9sDELIT1PxUMr1xdr+9+L98FgKByz+xCbOqfbemcLXcsFg=="],
 
