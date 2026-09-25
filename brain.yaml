@@ -15,6 +15,7 @@ bundles:
   - federation
 add:
   - obsidian-vault
+  - contact
 
 # Local src/site.tsx layers over the shipped site package. Keep the structural
 # base and theme explicit so canonical rebuilds preserve the deployed site.
@@ -34,6 +35,35 @@ plugins:
     appPassword: ${ATPROTO_APP_PASSWORD}
   mcp:
     mode: debug
+  # Public contact door beside the atlas homepage. Behind the reverse proxy
+  # every visitor may share one peer address, so network limits equal the
+  # global ones. Requests are private records kept for 30 days.
+  contact:
+    intake:
+      http:
+        origin: "https://yeehaa.io"
+        maxBodyBytes: 8192
+        readTimeoutMs: 5000
+      admission:
+        windowSeconds: 3600
+        globalRequests: 300
+        networkRequests: 300
+        globalForms: 150
+        networkForms: 150
+        globalSubmissions: 10
+        networkSubmissions: 10
+        tokenTtlSeconds: 3600
+        receiptTtlSeconds: 3600
+        maxEntries: 500
+      storage:
+        retentionSeconds: 2592000
+        maxRecords: 100
+        maxBytes: 1048576
+      delivery:
+        maxAttempts: 3
+        retryWindowSeconds: 600
+      inboxUrl: "https://yeehaa.io/studio/workspaces/unified-inbox%3Ainbox"
+      preview: true
   topics:
     # High-signal public knowledge map: entity packages define default
     # projectionSourceRole; this instance tightens topic budget/creation.

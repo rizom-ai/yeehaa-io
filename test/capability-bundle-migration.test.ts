@@ -9,9 +9,27 @@ const reviewedTarget = Bun.YAML.parse(
   ).text(),
 ) as Record<string, unknown>;
 
+// After the crossover, the deployment adds the public contact door beside the
+// atlas homepage. Everything else must still be the reviewed crossover target.
+const { contact: activeContact, ...activePlugins } = active[
+  "plugins"
+] as Record<string, unknown>;
+const crossover = {
+  ...active,
+  add: (active["add"] as string[]).filter((name) => name !== "contact"),
+  plugins: activePlugins,
+};
+
 describe("active capability-bundle contract", () => {
-  it("exactly matches the reviewed professional migration target", () => {
-    expect(active).toEqual(reviewedTarget);
+  it("matches the reviewed professional migration target, plus the contact door", () => {
+    expect(crossover).toEqual(reviewedTarget);
+    expect(active["add"]).toEqual(["obsidian-vault", "contact"]);
+    expect(activeContact).toMatchObject({
+      intake: {
+        http: { origin: "https://yeehaa.io" },
+        inboxUrl: "https://yeehaa.io/studio/workspaces/unified-inbox%3Ainbox",
+      },
+    });
     expect(active["bundleContract"]).toBe("capability-bundles-v1");
     expect(active["bundles"]).toEqual([
       "core",
@@ -26,7 +44,6 @@ describe("active capability-bundle contract", () => {
   });
 
   it("preserves every configured plugin block under the canonical names", () => {
-    const activePlugins = active["plugins"] as Record<string, unknown>;
     const targetPlugins = reviewedTarget["plugins"] as Record<string, unknown>;
 
     expect(Object.keys(activePlugins)).toHaveLength(11);
