@@ -50,6 +50,10 @@ const site = {
       navigation: { slot: "secondary" },
     },
   },
-} satisfies SiteDefinitionOverrides;
+  // The authored opening: the atlas homepage and its contact door.
+  pluginConfig: { homepageOpening: true },
+} satisfies SiteDefinitionOverrides & {
+  pluginConfig: { homepageOpening: boolean };
+};
 
 export default site;
