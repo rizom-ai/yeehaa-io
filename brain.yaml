@@ -66,6 +66,11 @@ plugins:
         retryWindowSeconds: 600
       inboxUrl: "https://yeehaa.io/studio/workspaces/unified-inbox%3Ainbox"
       preview: true
+  # Contact alerts go to the owner; without a recipient every alert fails.
+  notifications:
+    defaultRecipient:
+      type: email
+      address: ${SETUP_EMAIL_TO}
   topics:
     # High-signal public knowledge map: entity packages define default
     # projectionSourceRole; this instance tightens topic budget/creation.

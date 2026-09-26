@@ -10,10 +10,13 @@ const reviewedTarget = Bun.YAML.parse(
 ) as Record<string, unknown>;
 
 // After the crossover, the deployment adds the public contact door beside the
-// atlas homepage. Everything else must still be the reviewed crossover target.
-const { contact: activeContact, ...activePlugins } = active[
-  "plugins"
-] as Record<string, unknown>;
+// atlas homepage, with the owner as its alerts' recipient. Everything else must
+// still be the reviewed crossover target.
+const {
+  contact: activeContact,
+  notifications: activeNotifications,
+  ...activePlugins
+} = active["plugins"] as Record<string, unknown>;
 const crossover = {
   ...active,
   add: (active["add"] as string[]).filter((name) => name !== "contact"),
@@ -29,6 +32,10 @@ describe("active capability-bundle contract", () => {
         http: { origin: "https://yeehaa.io" },
         inboxUrl: "https://yeehaa.io/studio/workspaces/unified-inbox%3Ainbox",
       },
+    });
+    // Without a recipient every contact alert fails and waits unseen.
+    expect(activeNotifications).toEqual({
+      defaultRecipient: { type: "email", address: "${SETUP_EMAIL_TO}" },
     });
     expect(active["bundleContract"]).toBe("capability-bundles-v1");
     expect(active["bundles"]).toEqual([

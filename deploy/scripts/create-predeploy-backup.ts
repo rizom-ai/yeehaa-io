@@ -2,6 +2,32 @@ import { Database } from "bun:sqlite";
 import { Buffer } from "node:buffer";
 import { appendFileSync } from "node:fs";
 
+const getPrototypeOf: (value: object) => object | null = Object.getPrototypeOf;
+
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) {
+    return false;
+  }
+
+  const prototype = getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
+}
+
+/**
+ * The slice of `@libsql/client` this script uses.
+ *
+ * Declared here because the import is dynamic — the package is optional, and
+ * only the libsql quick-check driver needs it.
+ */
+interface LibsqlModule {
+  createClient(options: { url: string }): {
+    execute(sql: string): Promise<{
+      rows: Array<Record<string | number, unknown>>;
+    }>;
+    close(): void;
+  };
+}
+
 export const DEFAULT_PREDEPLOY_BACKUP_RETENTION_COUNT = 5;
 export const PREDEPLOY_BACKUP_TOOL_VERSION = "brains-predeploy-backup-v1";
 
@@ -157,10 +183,8 @@ async function quickCheck(
   if (driver === "bun") {
     const database = new Database(path, { readonly: true });
     try {
-      const row = database.query("PRAGMA quick_check").get() as Record<
-        string,
-        unknown
-      > | null;
+      const result: unknown = database.query("PRAGMA quick_check").get();
+      const row = isPlainRecord(result) ? result : null;
       return String(row?.["quick_check"] ?? row?.["0"] ?? "");
     } finally {
       database.close(false);
@@ -168,14 +192,10 @@ async function quickCheck(
   }
 
   const moduleName = "@libsql/client";
-  const libsql = (await import(moduleName)) as {
-    createClient(options: { url: string }): {
-      execute(sql: string): Promise<{
-        rows: Array<Record<string | number, unknown>>;
-      }>;
-      close(): void;
-    };
-  };
+  // Annotated rather than asserted: a dynamic import of an optional dependency
+  // resolves to `any`, so naming the slice this script uses is a checked
+  // assignment instead of a claim about the whole module.
+  const libsql: LibsqlModule = await import(moduleName);
   const client = libsql.createClient({ url: `file:${path}` });
   try {
     const result = await client.execute("PRAGMA quick_check");
@@ -198,9 +218,10 @@ function vectorDigestDatabase(database: Database): {
   const counts: Record<string, number> = {};
   for (const [table, order] of tables) {
     hasher.update(`table:${table}\n`);
-    const rows = database
+    const selected: unknown[] = database
       .query(`SELECT * FROM ${table} ORDER BY ${order}`)
-      .all() as Array<Record<string, unknown>>;
+      .all();
+    const rows = selected.filter(isPlainRecord);
     counts[table] = rows.length;
     for (const row of rows) {
       for (const [key, value] of Object.entries(row)) {
@@ -549,6 +570,33 @@ function shellSafe(value: string, name: string): string {
   return value;
 }
 
+/**
+ * Run inside the current runtime before capture. The snapshot proves itself
+ * (transactional copies, quick_check, checksums), so it needs a serving
+ * runtime with no queued work, not a healthy one: a deploy is often the fix
+ * for whatever a plugin reports as degraded. Degradation is named, not refused.
+ */
+export function renderPredeployReadinessProgram(
+  healthUrl: string = "http://127.0.0.1:8080/health/ready",
+): string {
+  return `const response = await fetch(${JSON.stringify(healthUrl)});
+const health = await response.json();
+const queue = health.resources?.queue;
+if (response.status !== 200 || health.status !== "ready") {
+  console.error("pre-deploy snapshot: current runtime is not ready");
+  process.exit(1);
+}
+if (queue && (queue.totals?.pending !== 0 || queue.totals?.processing !== 0 || queue.staleLeaseCount !== 0)) {
+  console.error("pre-deploy snapshot: job queue is not idle");
+  process.exit(1);
+}
+if (health.operationalStatus !== "operational") {
+  const degraded = (health.checks ?? []).filter((check) => check.status !== "healthy").map((check) => check.name);
+  console.error("pre-deploy snapshot: runtime is degraded (" + degraded.join(", ") + "); backing it up anyway");
+}
+`;
+}
+
 export function renderPredeployBackupRemoteScript(options?: {
   captureProgramBase64?: string;
 }): string {
@@ -599,12 +647,7 @@ if [ "$status" != running ] || [ "$health" != healthy ]; then
 fi
 
 docker exec "$container" bun -e '
-const response = await fetch("http://127.0.0.1:8080/health/ready");
-const health = await response.json();
-const queue = health.resources?.queue;
-if (response.status !== 200 || health.status !== "ready" || health.operationalStatus !== "operational") process.exit(1);
-if (queue && (queue.totals?.pending !== 0 || queue.totals?.processing !== 0 || queue.staleLeaseCount !== 0)) process.exit(1);
-'
+${renderPredeployReadinessProgram()}'
 
 required_databases=(
   "$state_root/brain.db"
