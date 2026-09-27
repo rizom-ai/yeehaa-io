@@ -102,7 +102,9 @@ plugins:
     linkedin:
       accessToken: ${LINKEDIN_ACCESS_TOKEN}
   newsletter:
-    apiKey: ${BUTTONDOWN_API_KEY}
+    provider:
+      type: buttondown
+      apiKey: ${BUTTONDOWN_API_KEY}
   analytics:
     cloudflare:
       accountId: ${CLOUDFLARE_ACCOUNT_ID}
