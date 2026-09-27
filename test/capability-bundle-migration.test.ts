@@ -53,11 +53,11 @@ describe("active capability-bundle contract", () => {
   it("preserves every configured plugin block under the canonical names", () => {
     const targetPlugins = reviewedTarget["plugins"] as Record<string, unknown>;
 
-    expect(Object.keys(activePlugins)).toHaveLength(11);
+    expect(Object.keys(activePlugins)).toHaveLength(10);
     expect(activePlugins).toEqual(targetPlugins);
-    expect(activePlugins["studio"]).toEqual({
-      passkeyLogin: { contentRepoToken: "${CMS_CONTENT_REPO_PAT}" },
-    });
+    // Studio takes no configuration here. Its schema is strict, so a leftover
+    // key drops Studio (and contact, which depends on it) from the app.
+    expect(activePlugins["studio"]).toBeUndefined();
     expect(activePlugins["cms"]).toBeUndefined();
   });
 });
