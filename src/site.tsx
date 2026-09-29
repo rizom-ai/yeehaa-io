@@ -52,6 +52,17 @@ const site = {
   },
   // The authored opening: the atlas homepage and its contact door.
   pluginConfig: { homepageOpening: true },
+  // Plain words in the header and footer instead of spaced monospace
+  // capitals, and a slim bar on a phone, where the screen is short.
+  themeOverride: `
+.nav-link { font-family: var(--font-body); font-size: .95rem; font-weight: 400; letter-spacing: 0; text-transform: none; }
+footer .font-mono.uppercase { font-family: var(--font-body); font-size: .8rem; letter-spacing: 0; text-transform: none; }
+@media (max-width: 47.99rem) {
+  header.sticky { padding-block: .6rem; }
+  #mobile-menu-button { padding: .35rem; }
+  #mobile-menu-button svg { width: 1.25rem; height: 1.25rem; }
+}
+`,
 } satisfies SiteDefinitionOverrides & {
   pluginConfig: { homepageOpening: boolean };
 };
