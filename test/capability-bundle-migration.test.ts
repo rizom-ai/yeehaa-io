@@ -10,15 +10,17 @@ const reviewedTarget = Bun.YAML.parse(
 ) as Record<string, unknown>;
 
 // After the crossover, the deployment adds the public contact door beside the
-// atlas homepage, with the owner as its alerts' recipient. Everything else must
-// still be the reviewed crossover target.
+// atlas homepage, with the owner as its alerts' recipient, and drops
+// conversation memory. Everything else must still be the reviewed crossover
+// target.
 const {
   contact: activeContact,
   notifications: activeNotifications,
   ...activePlugins
 } = active["plugins"] as Record<string, unknown>;
-const crossover = {
-  ...active,
+const { remove: activeRemove, ...activeRest } = active;
+const crossover: Record<string, unknown> = {
+  ...activeRest,
   add: (active["add"] as string[]).filter((name) => name !== "contact"),
   plugins: activePlugins,
 };
@@ -27,6 +29,8 @@ describe("active capability-bundle contract", () => {
   it("matches the reviewed professional migration target, plus the contact door", () => {
     expect(crossover).toEqual(reviewedTarget);
     expect(active["add"]).toEqual(["obsidian-vault", "contact"]);
+    // No conversation summaries, decisions or action items on this brain.
+    expect(activeRemove).toEqual(["conversation-memory"]);
     // The plugin derives the intake origin, preview host and Inbox link from
     // the brain's own site, and refuses them as configuration: the web
     // container does not boot with them.
