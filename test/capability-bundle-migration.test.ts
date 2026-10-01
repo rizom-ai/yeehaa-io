@@ -27,11 +27,18 @@ describe("active capability-bundle contract", () => {
   it("matches the reviewed professional migration target, plus the contact door", () => {
     expect(crossover).toEqual(reviewedTarget);
     expect(active["add"]).toEqual(["obsidian-vault", "contact"]);
+    // The plugin derives the intake origin, preview host and Inbox link from
+    // the brain's own site, and refuses them as configuration: the web
+    // container does not boot with them.
+    for (const derived of [
+      ["intake", "http", "origin"],
+      ["intake", "http", "trustForwardedProto"],
+      ["intake", "inboxUrl"],
+      ["intake", "preview"],
+    ])
+      expect(activeContact).not.toHaveProperty(derived);
     expect(activeContact).toMatchObject({
-      intake: {
-        http: { origin: "https://yeehaa.io" },
-        inboxUrl: "https://yeehaa.io/studio/workspaces/unified-inbox%3Ainbox",
-      },
+      intake: { delivery: { maxAttempts: 3 } },
     });
     // Without a recipient every contact alert fails and waits unseen.
     expect(activeNotifications).toEqual({
