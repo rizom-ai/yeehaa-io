@@ -16,6 +16,9 @@ bundles:
 add:
   - obsidian-vault
   - contact
+# No conversation summaries, decisions or action items on this brain.
+remove:
+  - conversation-memory
 
 # Local src/site.tsx layers over the shipped site package. Keep the structural
 # base and theme explicit so canonical rebuilds preserve the deployed site.
