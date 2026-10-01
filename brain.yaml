@@ -41,11 +41,8 @@ plugins:
   contact:
     intake:
       http:
-        origin: "https://yeehaa.io"
         maxBodyBytes: 8192
         readTimeoutMs: 5000
-        # Kamal terminates TLS and forwards plain HTTP on the private network.
-        trustForwardedProto: true
       admission:
         windowSeconds: 3600
         globalRequests: 300
@@ -64,8 +61,6 @@ plugins:
       delivery:
         maxAttempts: 3
         retryWindowSeconds: 600
-      inboxUrl: "https://yeehaa.io/studio/workspaces/unified-inbox%3Ainbox"
-      preview: true
   # Contact alerts go to the owner; without a recipient every alert fails.
   notifications:
     defaultRecipient:
