@@ -37,7 +37,7 @@ describe("deployment runtime storage", () => {
     expect(packageConfig["packageManager"]).toBe("bun@1.4.0");
     expect(packageConfig).toMatchObject({
       dependencies: {
-        "@rizom/brain": "0.2.0-alpha.507",
+        "@rizom/brain": "0.2.0-alpha.513",
         "@rizom/site": "0.2.0-alpha.235",
         react: "^19.2.7",
         "react-dom": "^19.2.7",
