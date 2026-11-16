@@ -40,7 +40,7 @@ plugins:
     mode: debug
   # Public contact door beside the atlas homepage. Behind the reverse proxy
   # every visitor may share one peer address, so network limits equal the
-  # global ones. Requests are private records kept for 30 days.
+  # global ones. Requests are private records kept until the owner deletes them.
   contact:
     intake:
       http:
@@ -57,10 +57,6 @@ plugins:
         tokenTtlSeconds: 3600
         receiptTtlSeconds: 3600
         maxEntries: 500
-      storage:
-        retentionSeconds: 2592000
-        maxRecords: 100
-        maxBytes: 1048576
       delivery:
         maxAttempts: 3
         retryWindowSeconds: 600
