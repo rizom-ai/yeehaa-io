@@ -39,6 +39,7 @@ jobs:
         env:
           BWS_ACCESS_TOKEN: ${{ secrets.BWS_ACCESS_TOKEN }}
         run: |
+          bunx varlock@1.1.0 load --path .env.schema --format json --compact > /tmp/varlock-env.json
           bun deploy/scripts/export-varlock-env.ts /tmp/varlock-env.json
 
       - name: Write Kamal SSH key

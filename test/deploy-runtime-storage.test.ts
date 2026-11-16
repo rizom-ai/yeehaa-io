@@ -141,6 +141,22 @@ describe("deployment runtime storage", () => {
     expect(ciWorkflowText).not.toContain("kamal");
   });
 
+  it("loads the Varlock environment before exporting it, in Deploy and the conversion", async () => {
+    const conversionConfig = Bun.YAML.parse(
+      await Bun.file(
+        new URL("../.github/workflows/binary-asset-conversion.yml", import.meta.url),
+      ).text(),
+    ) as Record<string, any>;
+    const load =
+      "bunx varlock@1.1.0 load --path .env.schema --format json --compact > /tmp/varlock-env.json\nbun deploy/scripts/export-varlock-env.ts /tmp/varlock-env.json\n";
+    for (const steps of [
+      deployWorkflowConfig["jobs"]["deploy"]["steps"],
+      conversionConfig["jobs"]["convert"]["steps"],
+    ] as { name?: string; run?: string }[][]) {
+      expect(steps.find((step) => step.name === "Load env via varlock")?.run).toBe(load);
+    }
+  });
+
   it("publishes and deploys only from main or explicit dispatch", () => {
     expect(publishWorkflowConfig["on"]["pull_request"]).toBeUndefined();
     expect(publishWorkflowConfig["on"]["push"]).toEqual({
