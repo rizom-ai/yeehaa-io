@@ -44,6 +44,11 @@ describe("active capability-bundle contract", () => {
     expect(activeContact).toMatchObject({
       intake: { delivery: { maxAttempts: 3 } },
     });
+    // Requests are kept until the owner deletes them; the intake has no
+    // retention or storage caps, and refuses a storage block at boot.
+    expect(
+      (activeContact as { intake: Record<string, unknown> }).intake,
+    ).not.toHaveProperty("storage");
     // Without a recipient every contact alert fails and waits unseen.
     expect(activeNotifications).toEqual({
       defaultRecipient: { type: "email", address: "${SETUP_EMAIL_TO}" },
