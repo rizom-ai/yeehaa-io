@@ -99,6 +99,21 @@ describe("deployment runtime storage", () => {
     expect(deployIndex).toBeGreaterThan(backupIndex);
   });
 
+  it("passes the model key under the provider's name the brain reads", async () => {
+    // Since @rizom/brain 0.2.0-alpha.730 (brains #927) each provider reads
+    // its own key and AI_API_KEY is no longer read: the brain's OpenAI
+    // models stop `brain start` without OPENAI_API_KEY.
+    const envSchema = await Bun.file(
+      new URL("../.env.schema", import.meta.url),
+    ).text();
+    expect(deployConfig).toMatch(/^ {4}- OPENAI_API_KEY$/m);
+    expect(deployConfig).not.toMatch(/^ {4}- AI_API_KEY$/m);
+    expect(envSchema).toMatch(
+      /# @required @sensitive\nOPENAI_API_KEY=bitwarden\("17ee8ea6-6967-4b78-9087-b4420106cdd6"\)/,
+    );
+    expect(envSchema).not.toMatch(/^AI_(API|IMAGE)_KEY=/m);
+  });
+
   it("persists auth state outside disposable containers", () => {
     expect(deployConfig).toContain("- /opt/brain-runtime:/app/data");
   });
