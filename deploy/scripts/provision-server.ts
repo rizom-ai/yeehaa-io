@@ -15,7 +15,11 @@ const headers: Record<string, string> = {
   Authorization: `Bearer ${token}`,
   "Content-Type": "application/json",
 };
-const baseUrl = "https://api.hetzner.cloud/v1";
+const baseUrl = process.env["HCLOUD_API_URL"] ?? "https://api.hetzner.cloud/v1";
+// LOOKUP_ONLY=1 resolves the brain's existing server and never creates one:
+// a maintenance run (the binary asset conversion) needs the host that holds
+// the data, not a new empty one.
+const lookupOnly = process.env["LOOKUP_ONLY"] === "1";
 const labelSelector = `brain=${instanceName}`;
 const MAX_POLLS = 30;
 const POLL_INTERVAL_MS = 10_000;
@@ -81,7 +85,13 @@ async function getServer(id: number): Promise<HetznerServer> {
   return payload.server;
 }
 
-let server: HetznerServer | undefined = (await listServers())[0];
+const servers = await listServers();
+if (lookupOnly && servers.length !== 1) {
+  throw new Error(
+    `Expected one server labeled ${labelSelector}, found ${servers.length}; refusing to create one in lookup mode`,
+  );
+}
+let server: HetznerServer | undefined = servers[0];
 server ??= await createServer();
 
 let polls = 0;

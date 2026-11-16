@@ -1,0 +1,7 @@
+[web] [2026-11-15T17:08:31.374Z] [brain] 🚀 Starting brain v0.2.0-alpha.715...
+[web] [2026-11-15T17:08:31.442Z] [shell] Failed to initialize Shell
+DatabaseLeaseConflictError: Refusing to start: a maintenance command is converting this database (assets:migrate: process 4242 on host rover-smoke, started 2026-11-15T17:07:28.019Z, heartbeat 7s ago). Start the brain once it finishes.
+[web] [2026-11-15T17:08:31.447Z] [JobQueueWorker] Worker is not running
+[web] [2026-11-15T17:08:31.450Z] [brain] ❌ Failed to start brain:
+DatabaseLeaseConflictError: Refusing to start: a maintenance command is converting this database (assets:migrate: process 4242 on host rover-smoke, started 2026-11-15T17:07:28.019Z, heartbeat 7s ago). Start the brain once it finishes.
+Brain web child exited before runtime-ready

@@ -1,0 +1,96 @@
+name: Binary Asset Conversion
+
+# Operator-run conversion of this brain's inline images to durable assets, on
+# its host. `dry-run` keeps the app running: `brain assets:migrate --dry-run`
+# and `assets:reconcile --dry-run` run in an offline maintenance container on
+# a VACUUM INTO copy of the live brain.db, which is deleted afterwards.
+# `migrate` checks the queue is idle, stops the app, checks from the host that
+# no process holds brain.db, takes a cold snapshot, migrates and verifies,
+# restores the snapshot when either fails, and starts the app again on every
+# exit after the stop. The job summary carries the outcome, the snapshot or
+# copy path and each command's report.
+#
+# The host is reached exactly as Deploy reaches it: the Hetzner server labeled
+# with this repository's name (looked up, never created), the Kamal deploy key
+# and the pinned SSH host fingerprint.
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: dry-run reports on a copy, app running; migrate stops the app and converts from a cold snapshot
+        required: true
+        type: choice
+        default: dry-run
+        options:
+          - dry-run
+          - migrate
+      confirm:
+        description: Type assets:<repository name> to confirm the brain stops during a migrate
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    concurrency:
+      # Same group as Deploy, so a conversion never races a deploy.
+      group: deploy-${{ github.event.repository.name }}
+      cancel-in-progress: false
+    env:
+      HANDLE: ${{ github.event.repository.name }}
+      MODE: ${{ inputs.mode }}
+      CONFIRM: ${{ inputs.confirm }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.0
+
+      - name: Check inputs
+        run: |
+          bun -e 'import { parseInputs } from "./scripts/binary-asset-conversion.ts"; parseInputs({ handle: process.env.HANDLE, mode: process.env.MODE, confirm: process.env.CONFIRM });'
+
+      - name: Extract config from brain.yaml
+        run: ./scripts/extract-brain-config.rb
+        env:
+          INSTANCE_NAME: ${{ github.event.repository.name }}
+
+      - name: Load env via varlock
+        env:
+          BWS_ACCESS_TOKEN: ${{ secrets.BWS_ACCESS_TOKEN }}
+        run: |
+          bunx varlock@1.1.0 load --path .env.schema --format json --compact > /tmp/varlock-env.json
+          bun deploy/scripts/export-varlock-env.ts /tmp/varlock-env.json
+
+      - name: Write Kamal SSH key
+        run: bun deploy/scripts/write-ssh-key.ts /tmp/varlock-env.json
+
+      - name: Resolve server
+        id: provision
+        env:
+          LOOKUP_ONLY: "1"
+        run: bun deploy/scripts/provision-server.ts
+
+      - name: Verify SSH host identity
+        env:
+          SERVER_IP: ${{ steps.provision.outputs.server_ip }}
+        run: deploy/scripts/trust-ssh-host.sh "$SERVER_IP"
+
+      - name: Convert binary assets
+        env:
+          SERVER_IP: ${{ steps.provision.outputs.server_ip }}
+        run: |
+          SSH_USER="$(ruby -e 'require "yaml"; config = YAML.load_file("config/deploy.yml") || {}; puts(config.dig("ssh", "user") || "root")')"
+          export SSH_USER
+          bun scripts/binary-asset-conversion.ts
+
+      - name: Remove the loaded environment
+        if: always()
+        run: rm -f /tmp/varlock-env.json
