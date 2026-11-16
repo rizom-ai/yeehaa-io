@@ -1,0 +1,3 @@
+Refusing to continue: /data/brain.db holds lease(s) that stopped renewing without being released, which a crash leaves:
+  brain: process 4242 on host rover-smoke, started 2026-11-15T15:55:41.321Z, heartbeat 10m ago
+If no brain runs on this database, rerun with --ignore-stale-heartbeat.

@@ -1,0 +1,1 @@
+Refusing to continue: process(es) 2817 hold /data/brain.db open. Stop the app first.

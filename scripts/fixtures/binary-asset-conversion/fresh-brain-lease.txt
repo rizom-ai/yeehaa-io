@@ -1,0 +1,4 @@
+Refusing to continue: /data/brain.db is in use.
+  brain: process 1868283 on host rover-smoke, started 2026-11-15T17:08:45.045Z, heartbeat 9s ago
+  brain: process 1868730 on host rover-smoke, started 2026-11-15T17:08:46.840Z, heartbeat 8s ago
+Stop the brain first, or wait for the command to finish.

@@ -1,0 +1,7 @@
+Binary asset migration dry-run for /data/brain.db
+0 inline image(s): 0 ready, 0 blocked; 0 already migrated.
+Ready images: 0 distinct, 0 duplicate row(s), 0 already stored.
+New asset bytes: 0.0 MiB; inline content removed: 0.0 MiB.
+Full-text rows to remove: 0. Content hashes that change: 0.
+Disk: database 0.2 MiB, backup 0.2 MiB, after migration 0.2 MiB, VACUUM copy 0.2 MiB; peak 0.6 MiB.
+No blockers.

@@ -74,11 +74,19 @@ describe("deployment runtime storage", () => {
     expect(expectedHostKey).toBe(
       "SHA256:O4H13ugPhbYit8qcs5CKaXCdZInFaYLlWgEU88YH9O4",
     );
+    // Deploy and the binary asset conversion trust the host through one
+    // script, against the pinned fingerprint.
+    const trustScript = await Bun.file(
+      new URL("../deploy/scripts/trust-ssh-host.sh", import.meta.url),
+    ).text();
     expect(deployWorkflow).toContain("Verify SSH host identity");
-    expect(deployWorkflow).toContain("deploy/ssh-host-key.sha256");
-    expect(deployWorkflow).toContain("StrictHostKeyChecking yes");
-    expect(deployWorkflow).not.toContain("StrictHostKeyChecking no");
-    expect(deployWorkflow).not.toContain("UserKnownHostsFile /dev/null");
+    expect(deployWorkflow).toContain('deploy/scripts/trust-ssh-host.sh "$SERVER_IP"');
+    expect(trustScript).toContain("deploy/ssh-host-key.sha256");
+    expect(trustScript).toContain("StrictHostKeyChecking yes");
+    for (const source of [deployWorkflow, trustScript]) {
+      expect(source).not.toContain("StrictHostKeyChecking no");
+      expect(source).not.toContain("UserKnownHostsFile /dev/null");
+    }
   });
 
   it("gates replacement on the released canonical backup command", async () => {

@@ -1,0 +1,27 @@
+name: Lint
+
+# Workflow files and host-side shell scripts. A workflow GitHub cannot parse
+# fails only when it is triggered, so it is checked on every pull request.
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      # The image bundles shellcheck, so run: blocks are checked too.
+      - name: Lint workflows
+        run: docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:1.7.7 -color
+
+      - name: Lint shell scripts
+        run: |
+          mapfile -t scripts < <(git ls-files '*.sh' '.githooks/*' '.kamal/hooks/*')
+          docker run --rm -v "$PWD:/repo" -w /repo koalaman/shellcheck:v0.10.0 "${scripts[@]}"
