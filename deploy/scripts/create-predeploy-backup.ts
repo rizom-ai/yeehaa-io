@@ -40,6 +40,49 @@ export interface PredeployDatabaseSource {
   method: DatabaseCaptureMethod;
   quickCheck: QuickCheckDriver;
   logicalVector: boolean;
+  /** Verify the image assets the snapshot's entities reference. */
+  assets?: boolean | undefined;
+}
+
+/** A referenced asset whose stored bytes do not verify. */
+interface AssetFailure {
+  digest: string;
+  /** The entities referencing it, as `type/id`. */
+  entities: string[];
+  reason: string;
+}
+
+/** The asset inventory a snapshot holds, and what of it verified. */
+interface AssetSnapshotReport {
+  /** Entity rows referencing an asset. */
+  references: number;
+  /** Distinct referenced assets, each re-hashed from its chunks. */
+  assets: number;
+  totalBytes: number;
+  /** Staged uploads no asset publishes; harmless, reported only. */
+  orphanUploads: number;
+  verified: number;
+  failed: number;
+  failures: AssetFailure[];
+  digests: string[];
+}
+
+/** Where the capture program writes what the deploy log shows. */
+export interface PredeployCaptureOutput {
+  stdout(line: string): void;
+  stderr(line: string): void;
+}
+
+const consoleOutput: PredeployCaptureOutput = {
+  stdout: (line) => console.log(line),
+  stderr: (line) => console.error(line),
+};
+
+/** The asset counts a backup reports, read back from its output. */
+export interface PredeployAssetSummary {
+  referenced: number;
+  verified: number;
+  failed: number;
 }
 
 export interface PredeployBackupMetadata {
@@ -73,6 +116,8 @@ export type PredeployBackupResult =
       totalBytes: number;
       durationSeconds: number;
       verification: "passed";
+      /** Absent when the backup reported no asset counts. */
+      assets?: PredeployAssetSummary;
     };
 
 interface CommandResult {
@@ -92,6 +137,7 @@ interface DatabaseCaptureRecord extends Omit<
   sha256: string;
   quickCheckDriver: QuickCheckDriver;
   quickCheck: string;
+  assetVerification?: Omit<AssetSnapshotReport, "digests" | "failures">;
 }
 
 interface GitCaptureRecord {
@@ -176,12 +222,26 @@ function gitRemoteEnvironment():
   };
 }
 
+/** How long a snapshot read waits on a runtime that holds the database. */
+const SNAPSHOT_BUSY_TIMEOUT_MS = 10_000;
+
+/**
+ * Open a database for reading a snapshot. The runtime is live while the
+ * backup runs, so a reader can meet a writer's lock or a WAL recovery in
+ * progress; it waits for them instead of failing the backup at once.
+ */
+function openSnapshotReader(path: string): Database {
+  const database = new Database(path, { readonly: true });
+  database.run(`PRAGMA busy_timeout = ${SNAPSHOT_BUSY_TIMEOUT_MS}`);
+  return database;
+}
+
 async function quickCheck(
   path: string,
   driver: QuickCheckDriver,
 ): Promise<string> {
   if (driver === "bun") {
-    const database = new Database(path, { readonly: true });
+    const database = openSnapshotReader(path);
     try {
       const result: unknown = database.query("PRAGMA quick_check").get();
       const row = isPlainRecord(result) ? result : null;
@@ -248,11 +308,145 @@ function vectorDigestDatabase(database: Database): {
   return { counts, sha256: hasher.digest("hex") };
 }
 
+const ASSET_REF_PREFIX = "asset://sha256/";
+/** How the capture names a failed asset on stderr, for the deploy log. */
+const ASSET_FAILURE_PREFIX = "pre-deploy snapshot: asset failed: ";
+
+/**
+ * Check every asset the snapshot's entities reference: a published header
+ * whose chunks run contiguously, add up to its size and hash to its digest.
+ * Any failure blocks the backup. A database from before staged asset
+ * storage references none.
+ */
+/**
+ * Re-hash every asset the snapshot's entities reference. Each asset is
+ * checked on its own, so one bad asset does not hide the others: the report
+ * names every failure and the entities that reference it.
+ */
+function verifySnapshotAssets(path: string): AssetSnapshotReport {
+  const database = new Database(path, { readonly: true });
+  try {
+    const tables = new Set(
+      database
+        .query("SELECT name FROM sqlite_master WHERE type = 'table'")
+        .all()
+        .filter(isPlainRecord)
+        .map((row) => String(row["name"])),
+    );
+    if (!tables.has("asset_chunks")) {
+      return {
+        references: 0,
+        assets: 0,
+        totalBytes: 0,
+        orphanUploads: 0,
+        verified: 0,
+        failed: 0,
+        failures: [],
+        digests: [],
+      };
+    }
+    const referencing = new Map<string, string[]>();
+    database
+      .query(
+        "SELECT content, entityType, id FROM entities WHERE content LIKE ? ORDER BY content, entityType, id",
+      )
+      .all(`${ASSET_REF_PREFIX}%`)
+      .filter(isPlainRecord)
+      .forEach((row) => {
+        const digest = String(row["content"]).slice(ASSET_REF_PREFIX.length);
+        const entity = `${String(row["entityType"])}/${String(row["id"])}`;
+        referencing.set(digest, [...(referencing.get(digest) ?? []), entity]);
+      });
+    const header = database.query(
+      "SELECT upload_id, size_bytes, chunk_count FROM assets WHERE digest = ?",
+    );
+    const chunks = database.query(
+      "SELECT ordinal, bytes FROM asset_chunks WHERE upload_id = ? ORDER BY ordinal",
+    );
+    /** The asset's size when its chunks verify, else why they do not. */
+    const verify = (digest: string): { size: number } | { reason: string } => {
+      const row = header.get(digest);
+      if (!isPlainRecord(row)) return { reason: "has no published asset" };
+      const sizeBytes = Number(row["size_bytes"]);
+      const chunkCount = Number(row["chunk_count"]);
+      const hasher = new Bun.CryptoHasher("sha256");
+      const read = { chunks: 0, bytes: 0 };
+      for (const chunk of chunks.iterate(String(row["upload_id"]))) {
+        if (!isPlainRecord(chunk) || Number(chunk["ordinal"]) !== read.chunks) {
+          return { reason: `is missing chunk ${read.chunks}` };
+        }
+        const bytes = chunk["bytes"];
+        if (!(bytes instanceof Uint8Array)) {
+          return { reason: `chunk ${read.chunks} is not binary` };
+        }
+        hasher.update(bytes);
+        read.chunks += 1;
+        read.bytes += bytes.byteLength;
+      }
+      if (read.chunks !== chunkCount || read.bytes !== sizeBytes) {
+        return {
+          reason: `holds ${read.chunks} chunks and ${read.bytes} bytes; expected ${chunkCount} and ${sizeBytes}`,
+        };
+      }
+      if (hasher.digest("hex") !== digest) {
+        return { reason: "chunks hash to a different digest" };
+      }
+      return { size: sizeBytes };
+    };
+    const results = [...referencing].map(([digest, entities]) => ({
+      digest,
+      entities,
+      outcome: verify(digest),
+    }));
+    const failures = results.flatMap(({ digest, entities, outcome }) =>
+      "reason" in outcome ? [{ digest, entities, reason: outcome.reason }] : [],
+    );
+    const orphans = database
+      .query(
+        "SELECT COUNT(*) AS count FROM asset_uploads WHERE upload_id NOT IN (SELECT upload_id FROM assets)",
+      )
+      .get();
+    return {
+      references: results.reduce(
+        (sum, { entities }) => sum + entities.length,
+        0,
+      ),
+      assets: results.length,
+      totalBytes: results.reduce(
+        (sum, { outcome }) => sum + ("size" in outcome ? outcome.size : 0),
+        0,
+      ),
+      orphanUploads: isPlainRecord(orphans) ? Number(orphans["count"]) : 0,
+      verified: results.length - failures.length,
+      failed: failures.length,
+      failures,
+      digests: results.map(({ digest }) => digest),
+    };
+  } finally {
+    database.close(false);
+  }
+}
+
+/** The counts and failures the deploy log shows, as the capture prints them. */
+function reportAssetVerification(
+  report: AssetSnapshotReport,
+  output: PredeployCaptureOutput,
+): void {
+  output.stdout(`ASSETS_REFERENCED=${report.assets}`);
+  output.stdout(`ASSETS_VERIFIED=${report.verified}`);
+  output.stdout(`ASSETS_FAILED=${report.failed}`);
+  report.failures.forEach(({ digest, entities, reason }) =>
+    output.stderr(
+      `${ASSET_FAILURE_PREFIX}${digest} (${entities.join(", ")}): ${reason}`,
+    ),
+  );
+}
+
 function vectorDigest(path: string): {
   counts: Record<string, number>;
   sha256: string;
 } {
-  const database = new Database(path, { readonly: true });
+  const database = openSnapshotReader(path);
   try {
     return vectorDigestDatabase(database);
   } finally {
@@ -262,6 +456,7 @@ function vectorDigest(path: string): {
 
 async function captureDatabases(
   config: PredeployCaptureConfig,
+  output: PredeployCaptureOutput,
 ): Promise<DatabaseCaptureRecord[]> {
   const captures: DatabaseCaptureRecord[] = [];
 
@@ -275,7 +470,7 @@ async function captureDatabases(
     }
 
     const startedAt = new Date().toISOString();
-    const database = new Database(source.source, { readonly: true });
+    const database = openSnapshotReader(source.source);
     let originalVectorDigest:
       { counts: Record<string, number>; sha256: string } | undefined;
     if (source.method === "serialize") {
@@ -315,6 +510,22 @@ async function captureDatabases(
       );
     }
 
+    const assetReport = source.assets
+      ? verifySnapshotAssets(destination)
+      : undefined;
+    if (assetReport) {
+      await Bun.write(
+        `${config.backupDir}/${source.name}.asset-verify.json`,
+        `${JSON.stringify(assetReport, null, 2)}\n`,
+      );
+      reportAssetVerification(assetReport, output);
+      if (assetReport.failed > 0) {
+        throw new Error(
+          `${source.name}: asset verification failed: ${assetReport.failed} of ${assetReport.assets} referenced assets`,
+        );
+      }
+    }
+
     const file = Bun.file(destination);
     const { quickCheck: quickCheckDriver, ...sourceMetadata } = source;
     captures.push({
@@ -327,6 +538,16 @@ async function captureDatabases(
       sha256: await sha256(destination),
       quickCheckDriver,
       quickCheck: check,
+      ...(assetReport && {
+        assetVerification: {
+          references: assetReport.references,
+          assets: assetReport.assets,
+          totalBytes: assetReport.totalBytes,
+          orphanUploads: assetReport.orphanUploads,
+          verified: assetReport.verified,
+          failed: assetReport.failed,
+        },
+      }),
     });
   }
 
@@ -490,8 +711,9 @@ async function captureGitCheckout(
 
 export async function capturePredeployBackup(
   config: PredeployCaptureConfig,
+  output: PredeployCaptureOutput = consoleOutput,
 ): Promise<void> {
-  const databases = await captureDatabases(config);
+  const databases = await captureDatabases(config, output);
   const git = await captureGitCheckout(config.contentRoot, config.backupDir);
   const manifest = {
     schemaVersion: 1,
@@ -523,6 +745,7 @@ function captureConfigFromEnvironment(): PredeployCaptureConfig {
         method: "vacuum",
         quickCheck: "bun",
         logicalVector: false,
+        assets: true,
       },
       {
         source: "/data/brain-jobs.db",
@@ -602,7 +825,7 @@ if (response.status !== 200 || health.status !== "ready") {
 }
 const abandoned = queue?.staleLeaseCount ?? 0;
 if (queue && (queue.totals?.pending !== 0 || queue.totals?.processing !== abandoned)) {
-  console.error("pre-deploy snapshot: job queue is not idle");
+  console.error("pre-deploy snapshot: job queue is not idle (" + (queue.totals?.pending ?? "?") + " pending, " + (queue.totals?.processing ?? "?") + " processing, " + abandoned + " abandoned); rerun once it drains");
   process.exit(1);
 }
 if (abandoned > 0) {
@@ -617,6 +840,60 @@ if (health.operationalStatus !== "operational") {
 
 /** The runtime's own notices from a successful capture, as workflow warnings;
  * other remote output (ssh host notes) stays out of the log. */
+/** The asset counts the capture printed, when it printed them. */
+function parseAssetSummary(output: string): PredeployAssetSummary | undefined {
+  const count = (name: string): number | undefined => {
+    const match = new RegExp(`^${name}=(\\d+)$`, "m").exec(output);
+    return match?.[1] === undefined ? undefined : Number(match[1]);
+  };
+  const referenced = count("ASSETS_REFERENCED");
+  const verified = count("ASSETS_VERIFIED");
+  const failed = count("ASSETS_FAILED");
+  return referenced === undefined ||
+    verified === undefined ||
+    failed === undefined
+    ? undefined
+    : { referenced, verified, failed };
+}
+
+function assetSummaryLine(assets: PredeployAssetSummary): string {
+  return `pre-deploy snapshot assets: ${assets.referenced} referenced, ${assets.verified} verified, ${assets.failed} failed`;
+}
+
+/** What the deploy log shows for a backup that completed. */
+export function predeployBackupLogLines(
+  result: PredeployBackupResult,
+): string[] {
+  if (!result.applicable) {
+    return ["pre-deploy snapshot: not applicable (new server)"];
+  }
+  return [
+    `pre-deploy snapshot verified: ${result.snapshotId}`,
+    ...(result.assets ? [assetSummaryLine(result.assets)] : []),
+  ];
+}
+
+/**
+ * What the deploy log shows for a backup that failed: the asset counts the
+ * capture reached, and each failed asset with the entities referencing it.
+ */
+export function predeployBackupFailureLines(
+  stdout: string,
+  stderr: string,
+): string[] {
+  const assets = parseAssetSummary(stdout);
+  return [
+    ...(assets ? [assetSummaryLine(assets)] : []),
+    ...stderr
+      .split("\n")
+      .filter((line) => line.startsWith(ASSET_FAILURE_PREFIX))
+      .map(
+        (line) =>
+          `::error title=Pre-deploy backup::${line.slice("pre-deploy snapshot: ".length).trim()}`,
+      ),
+  ];
+}
+
 export function predeployBackupNotices(stderr: string): string[] {
   const prefix = "pre-deploy snapshot: ";
   return stderr
@@ -839,6 +1116,7 @@ export function parsePredeployBackupOutput(
   ) {
     throw new Error("Incomplete predeploy backup result");
   }
+  const assets = parseAssetSummary(output);
   return {
     applicable: true,
     snapshotId,
@@ -848,6 +1126,7 @@ export function parsePredeployBackupOutput(
     totalBytes,
     durationSeconds,
     verification: "passed",
+    ...(assets && { assets }),
   };
 }
 
@@ -866,7 +1145,7 @@ function appendWorkflowResult(result: PredeployBackupResult): void {
     appendFileSync(
       summaryPath,
       result.applicable
-        ? `### Verified pre-deploy snapshot\n- Snapshot: \`${result.snapshotId}\`\n- Path: \`${result.backupPath}\`\n- Bytes: \`${result.totalBytes}\`\n- Duration: \`${result.durationSeconds}s\`\n- Verification: passed\n`
+        ? `### Verified pre-deploy snapshot\n- Snapshot: \`${result.snapshotId}\`\n- Path: \`${result.backupPath}\`\n- Bytes: \`${result.totalBytes}\`\n- Duration: \`${result.durationSeconds}s\`\n- Verification: passed\n${result.assets ? `- Assets: ${result.assets.referenced} referenced, ${result.assets.verified} verified, ${result.assets.failed} failed\n` : ""}`
         : "### Pre-deploy snapshot\nNot applicable: new server with no persistent state.\n",
     );
   }
@@ -923,6 +1202,9 @@ export async function runPredeployBackup(): Promise<PredeployBackupResult> {
     new Response(child.stderr).text(),
   ]);
   if (exitCode !== 0) {
+    for (const line of predeployBackupFailureLines(stdout, stderr)) {
+      console.log(line);
+    }
     const diagnostic = stderr.trim().slice(0, 1000);
     throw new Error(
       `Predeploy backup failed${diagnostic ? `: ${diagnostic}` : ""}`,
@@ -931,11 +1213,7 @@ export async function runPredeployBackup(): Promise<PredeployBackupResult> {
   for (const notice of predeployBackupNotices(stderr)) console.log(notice);
   const result = parsePredeployBackupOutput(stdout);
   appendWorkflowResult(result);
-  console.log(
-    result.applicable
-      ? `pre-deploy snapshot verified: ${result.snapshotId}`
-      : "pre-deploy snapshot: not applicable (new server)",
-  );
+  for (const line of predeployBackupLogLines(result)) console.log(line);
   return result;
 }
 
