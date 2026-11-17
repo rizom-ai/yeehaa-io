@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Convert one brain's inline images to durable assets, on its host, as root.
+# Convert one brain's inline images and PDFs to durable assets, on its host, as root.
 #
 #   binary-asset-conversion-remote.sh <dry-run|migrate> <handle>
 #
