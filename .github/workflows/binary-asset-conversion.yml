@@ -1,6 +1,6 @@
 name: Binary Asset Conversion
 
-# Operator-run conversion of this brain's inline images to durable assets, on
+# Operator-run conversion of this brain's inline images and PDFs to durable assets, on
 # its host. `dry-run` keeps the app running: `brain assets:migrate --dry-run`
 # and `assets:reconcile --dry-run` run in an offline maintenance container on
 # a VACUUM INTO copy of the live brain.db, which is deleted afterwards.
