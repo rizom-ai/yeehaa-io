@@ -107,6 +107,36 @@ describe("deployment runtime storage", () => {
     expect(deployIndex).toBeGreaterThan(backupIndex);
   });
 
+  it("lets a dispatched deploy skip the predeploy backup, operator-confirmed", () => {
+    // As @brains/deploy-support renders it (rizom-ai/brains#994): off by
+    // default and only on a dispatched run; a deploy started by Publish
+    // Image carries no inputs, so its backup always runs.
+    expect(deployWorkflowConfig["on"]["workflow_dispatch"]).toEqual({
+      inputs: {
+        skip_predeploy_backup: {
+          description:
+            "Skip the predeploy backup, operator-confirmed, when the running runtime cannot go idle; its last verified backup stands",
+          required: false,
+          type: "boolean",
+          default: false,
+        },
+      },
+    });
+    const steps = deployWorkflowConfig["jobs"]["deploy"]["steps"] as Array<{
+      name?: string;
+      if?: string;
+    }>;
+    const gated = steps.filter((step) =>
+      step.if?.includes("skip_predeploy_backup"),
+    );
+    expect(gated.map((step) => [step.name, step.if])).toEqual([
+      [
+        "Create verified predeploy backup",
+        "${{ !inputs.skip_predeploy_backup }}",
+      ],
+    ]);
+  });
+
   it("passes the model key under the provider's name the brain reads", async () => {
     // Since @rizom/brain 0.2.0-alpha.730 (brains #927) each provider reads
     // its own key and AI_API_KEY is no longer read: the brain's OpenAI

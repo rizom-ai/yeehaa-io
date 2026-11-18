@@ -6,6 +6,12 @@ on:
     branches: ["main"]
     types: [completed]
   workflow_dispatch:
+    inputs:
+      skip_predeploy_backup:
+        description: Skip the predeploy backup, operator-confirmed, when the running runtime cannot go idle; its last verified backup stands
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   deploy:
@@ -137,6 +143,7 @@ jobs:
           exit 1
 
       - name: Create verified predeploy backup
+        if: ${{ !inputs.skip_predeploy_backup }}
         env:
           SERVER_IP: ${{ steps.provision.outputs.server_ip }}
           TARGET_HANDLE: ${{ github.event.repository.name }}
