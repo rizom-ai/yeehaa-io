@@ -7,7 +7,12 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl ca-certificates git tini \
+    chromium-headless-shell fontconfig \
+    fonts-freefont-ttf fonts-ipafont-gothic fonts-liberation \
+    fonts-noto-color-emoji fonts-tlwg-loma-otf fonts-unifont fonts-wqy-zenhei \
     && rm -rf /var/lib/apt/lists/*
+
+ENV BUN_CHROME_PATH=/usr/bin/chromium-headless-shell
 
 ENV XDG_DATA_HOME=/data
 ENV XDG_CONFIG_HOME=/config
@@ -26,8 +31,6 @@ CMD ["bun", "./node_modules/@rizom/brain/dist/brain.js", "start"]
 FROM runtime AS standalone
 COPY package.json bun.lock ./
 RUN bun install --production --frozen-lockfile --ignore-scripts
-RUN bunx playwright-core install --with-deps chromium-headless-shell \
- && rm -rf /var/lib/apt/lists/* /tmp/*
 COPY . .
 
 # --- fleet: install published brain at pinned version (ops deploy) ---
